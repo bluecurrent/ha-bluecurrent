@@ -1,0 +1,80 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Device is already configured"
+        },
+        "error": {
+            "already_connected": "IP is already connected",
+            "cannot_connect": "Failed to connect",
+            "invalid_token": "Invalid token",
+            "limit_reached": "Request limit reached",
+            "no_cards_found": "No charge cards found",
+            "unknown": "Unexpected error"
+        },
+        "step": {
+            "card": {
+                "data": {
+                    "card": "Card"
+                },
+                "description": "Enter the name of your charge card",
+                "title": "Card"
+            },
+            "user": {
+                "data": {
+                    "add_card": "Do you want to use your own charge card?",
+                    "api_token": "API Token"
+                },
+                "description": "Enter your Blue Current api token",
+                "title": "Authentication"
+            }
+        }
+    },
+    "device_automation": {
+        "condition_type": {
+            "available": "charge point is available",
+            "charging": "charge point is charging",
+            "error": "charge point has error",
+            "no_power": "vehicle has no power",
+            "offline": "charge point is offline",
+            "ready": "vehicle is ready",
+            "standby": "vehicle is in standby",
+            "unavailable": "charge point is unavailable",
+            "vehicle_detected": "vehicle is detected",
+            "vehicle_error": "vehicle has error"
+        },
+        "trigger_type": {
+            "available": "charge point becomes available",
+            "charging": "charge point started charging",
+            "error": "charge point has error",
+            "no_power": "vehicle has no power",
+            "offline": "charge point is offline",
+            "ready": "vehicle is ready",
+            "standby": "vehicle is in standby",
+            "unavailable": "charge point becomes unavailable",
+            "vehicle_detected": "vehicle is detected",
+            "vehicle_error": "vehicle has error"
+        }
+    },
+    "entity": {
+        "sensor": {
+            "activity": {
+                "state": {
+                    "available": "Available",
+                    "charging": "Charging",
+                    "error": "Error",
+                    "offline": "Offline",
+                    "unavailable": "Unavailable"
+                }
+            },
+            "vehicle_status": {
+                "state": {
+                    "no_power": "No power",
+                    "ready": "Ready",
+                    "standby": "Standby",
+                    "vehicle_detected": "Detected",
+                    "vehicle_error": "Error"
+                }
+            }
+        }
+    }
+}
