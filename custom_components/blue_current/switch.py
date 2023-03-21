@@ -6,12 +6,8 @@ from dataclasses import dataclass
 from typing import Any
 
 from bluecurrent_api import Client
-
-from homeassistant.components.switch import (
-    SwitchDeviceClass,
-    SwitchEntity,
-    SwitchEntityDescription,
-)
+from homeassistant.components.switch import (SwitchDeviceClass, SwitchEntity,
+                                             SwitchEntityDescription)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback

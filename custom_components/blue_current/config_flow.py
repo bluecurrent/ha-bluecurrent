@@ -4,16 +4,11 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from bluecurrent_api import Client
-from bluecurrent_api.exceptions import (
-    AlreadyConnected,
-    InvalidApiToken,
-    NoCardsFound,
-    RequestLimitReached,
-    WebsocketException,
-)
 import voluptuous as vol
-
+from bluecurrent_api import Client
+from bluecurrent_api.exceptions import (AlreadyConnected, InvalidApiToken,
+                                        NoCardsFound, RequestLimitReached,
+                                        WebsocketException)
 from homeassistant import config_entries
 from homeassistant.const import CONF_API_TOKEN, CONF_NAME
 from homeassistant.data_entry_flow import FlowResult

@@ -4,23 +4,22 @@ from datetime import timedelta
 from typing import Any
 from unittest.mock import patch
 
+import pytest
 from bluecurrent_api.client import Client
 from bluecurrent_api.exceptions import RequestLimitReached, WebsocketException
-import pytest
+from homeassistant.config_entries import ConfigEntryState
+from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import ConfigEntryNotReady
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from homeassistant.components.blue_current import (
+from custom_components.blue_current import (
     DOMAIN,
     Connector,
     async_setup_entry,
     set_entities_unavalible,
 )
-from homeassistant.config_entries import ConfigEntryState
-from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import ConfigEntryNotReady
 
 from . import init_integration
-
-from tests.common import MockConfigEntry
 
 
 async def test_load_unload_entry(hass: HomeAssistant):
@@ -96,9 +95,8 @@ async def test_on_data(hass: HomeAssistant):
     await init_integration(hass, "sensor", {})
 
     with patch(
-        "homeassistant.components.blue_current.async_dispatcher_send"
+        "custom_components.blue_current.async_dispatcher_send"
     ) as test_async_dispatcher_send:
-
         connector: Connector = hass.data[DOMAIN]["uuid"]
 
         # test CHARGE_POINTS
@@ -241,9 +239,8 @@ async def test_start_loop(hass: HomeAssistant):
     """Tests start_loop."""
 
     with patch(
-        "homeassistant.components.blue_current.async_call_later"
+        "custom_components.blue_current.async_call_later"
     ) as test_async_call_later:
-
         config_entry = MockConfigEntry(
             domain=DOMAIN,
             entry_id="uuid",
@@ -275,9 +272,8 @@ async def test_reconnect(hass: HomeAssistant):
     ), patch(
         "bluecurrent_api.Client.get_next_reset_delta", return_value=timedelta(hours=1)
     ), patch(
-        "homeassistant.components.blue_current.async_call_later"
+        "custom_components.blue_current.async_call_later"
     ) as test_async_call_later:
-
         config_entry = MockConfigEntry(
             domain=DOMAIN,
             entry_id="uuid",

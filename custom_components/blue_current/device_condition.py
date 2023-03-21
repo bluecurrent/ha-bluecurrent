@@ -2,18 +2,15 @@
 from __future__ import annotations
 
 import voluptuous as vol
-
-from homeassistant.const import (
-    ATTR_ENTITY_ID,
-    CONF_CONDITION,
-    CONF_DEVICE_ID,
-    CONF_DOMAIN,
-    CONF_ENTITY_ID,
-    CONF_TYPE,
-)
+from homeassistant.const import (ATTR_ENTITY_ID, CONF_CONDITION,
+                                 CONF_DEVICE_ID, CONF_DOMAIN, CONF_ENTITY_ID,
+                                 CONF_TYPE)
 from homeassistant.core import HomeAssistant, callback
-from homeassistant.helpers import condition, config_validation as cv, device_registry
-from homeassistant.helpers.config_validation import DEVICE_CONDITION_BASE_SCHEMA
+from homeassistant.helpers import condition
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry
+from homeassistant.helpers.config_validation import \
+    DEVICE_CONDITION_BASE_SCHEMA
 from homeassistant.helpers.typing import ConfigType, TemplateVarsType
 
 from . import DOMAIN

@@ -1,7 +1,8 @@
 """Support for Blue Current buttons."""
 from __future__ import annotations
 
-from homeassistant.components.button import ButtonEntity, ButtonEntityDescription
+from homeassistant.components.button import (ButtonEntity,
+                                             ButtonEntityDescription)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback

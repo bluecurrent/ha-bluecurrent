@@ -4,13 +4,12 @@ from __future__ import annotations
 from unittest.mock import patch
 
 from bluecurrent_api import Client
-
-from homeassistant.components.blue_current import DOMAIN, Connector
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from tests.common import MockConfigEntry
+from custom_components.blue_current import DOMAIN, Connector
 
 
 async def init_integration(
@@ -33,9 +32,9 @@ async def init_integration(
         self.grid = grid
 
     with patch(
-        "homeassistant.components.blue_current.PLATFORMS", [platform]
+        "custom_components.blue_current.PLATFORMS", [platform]
     ), patch.object(Connector, "__init__", init), patch(
-        "homeassistant.components.blue_current.Client", autospec=True
+        "custom_components.blue_current.Client", autospec=True
     ):
         config_entry = MockConfigEntry(
             domain=DOMAIN,

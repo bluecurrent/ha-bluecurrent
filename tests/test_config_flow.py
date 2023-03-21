@@ -2,20 +2,18 @@
 from unittest.mock import patch
 
 from homeassistant import config_entries
-from homeassistant.components.blue_current import DOMAIN
-from homeassistant.components.blue_current.config_flow import (
-    AlreadyConnected,
-    InvalidApiToken,
-    NoCardsFound,
-    RequestLimitReached,
-    WebsocketException,
-)
 from homeassistant.config_entries import SOURCE_REAUTH
 from homeassistant.const import CONF_SOURCE
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from tests.common import MockConfigEntry
+from custom_components.blue_current import DOMAIN
+from custom_components.blue_current.config_flow import (AlreadyConnected,
+                                                        InvalidApiToken,
+                                                        NoCardsFound,
+                                                        RequestLimitReached,
+                                                        WebsocketException)
 
 
 async def test_form(hass: HomeAssistant) -> None:
@@ -37,7 +35,7 @@ async def test_default_card(hass: HomeAssistant) -> None:
     with patch("bluecurrent_api.Client.validate_api_token", return_value=True), patch(
         "bluecurrent_api.Client.get_email", return_value="test@email.com"
     ), patch(
-        "homeassistant.components.blue_current.async_setup_entry",
+        "custom_components.blue_current.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -65,7 +63,7 @@ async def test_user_card(hass: HomeAssistant) -> None:
         "bluecurrent_api.Client.get_charge_cards",
         return_value=[{"name": "card 1", "uid": 1}, {"name": "card 2", "uid": 2}],
     ), patch(
-        "homeassistant.components.blue_current.async_setup_entry",
+        "custom_components.blue_current.async_setup_entry",
         return_value=True,
     ):
         result2 = await hass.config_entries.flow.async_configure(
@@ -78,7 +76,7 @@ async def test_user_card(hass: HomeAssistant) -> None:
         "bluecurrent_api.Client.get_charge_cards",
         return_value=[{"name": "card 1", "uid": 1}, {"name": "card 2", "uid": 2}],
     ), patch(
-        "homeassistant.components.blue_current.async_setup_entry",
+        "custom_components.blue_current.async_setup_entry",
         return_value=True,
     ):
         result3 = await hass.config_entries.flow.async_configure(

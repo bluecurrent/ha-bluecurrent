@@ -6,15 +6,12 @@ from datetime import datetime
 from typing import Any
 
 from bluecurrent_api import Client
-from bluecurrent_api.exceptions import (
-    BlueCurrentException,
-    InvalidApiToken,
-    RequestLimitReached,
-    WebsocketException,
-)
-
+from bluecurrent_api.exceptions import (BlueCurrentException, InvalidApiToken,
+                                        RequestLimitReached,
+                                        WebsocketException)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_API_TOKEN, EVENT_HOMEASSISTANT_STOP, Platform
+from homeassistant.const import (CONF_API_TOKEN, EVENT_HOMEASSISTANT_STOP,
+                                 Platform)
 from homeassistant.core import Event, HomeAssistant, ServiceCall
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry

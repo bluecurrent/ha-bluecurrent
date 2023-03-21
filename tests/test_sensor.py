@@ -2,10 +2,11 @@
 from datetime import datetime
 from typing import Any
 
-from homeassistant.components.blue_current import Connector
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.dispatcher import async_dispatcher_send
+
+from custom_components.blue_current import Connector
 
 from . import init_integration
 

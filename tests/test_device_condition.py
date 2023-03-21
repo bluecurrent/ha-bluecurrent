@@ -2,22 +2,16 @@
 from __future__ import annotations
 
 import pytest
-
 from homeassistant.components import automation
-from homeassistant.components.blue_current import DOMAIN
 from homeassistant.components.device_automation import DeviceAutomationType
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import device_registry, entity_registry
 from homeassistant.setup import async_setup_component
+from pytest_homeassistant_custom_component.common import (
+    MockConfigEntry, assert_lists_same, async_get_device_automations,
+    async_mock_service, mock_device_registry, mock_registry)
 
-from tests.common import (
-    MockConfigEntry,
-    assert_lists_same,
-    async_get_device_automations,
-    async_mock_service,
-    mock_device_registry,
-    mock_registry,
-)
+from custom_components.blue_current import DOMAIN
 
 
 @pytest.fixture
