@@ -1,28 +1,68 @@
 # Integration Blueprint
 
-[![hacs][hacsbadge]][hacs]
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-**This integration will set up the following platforms.**
+The Blue Current integration allows you to connect to your blue current account to Home Assistant and monitor your charge point(s).
 
-Platform | Description
--- | --
-`sensor` | Show data from a charge point.
-`switch` | Switch something `True` or `False`.
-`button` | Run an action.
+
+## Prerequisites
+1. Log in to [my.bluecurrent](https://my.bluecurrent.nl/).
+2. Goto settings and enable developer mode.
+3. Generate an API token.
+
 
 ## Installation
 
-1. Using the tool of choice open the directory (folder) for your HA configuration (where you find `configuration.yaml`).
-1. If you do not have a `custom_components` directory (folder) there, you need to create it.
-1. In the `custom_components` directory (folder) create a new folder called `blue_current`.
-1. Download _all_ the files from the `custom_components/blue_current/` directory (folder) in this repository.
-1. Place the files you downloaded in the new directory (folder) you created.
-1. Restart Home Assistant
-1. In the HA UI go to "Configuration" -> "Integrations" click "+" and search for "Integration blueprint"
+-  [HACS](https://hacs.xyz/): add url https://github.com/bluecurrent/ha-bluecurrent as custom repository (HACS > Integration > option: Custom Repositories)
+- Restart Home Assistant.
+- Add 'Blue current' integration via HA Settings > 'Devices and Services' > 'Integrations'.
+- Provide your api key.
 
 ## Configuration is done in the UI
 
-<!---->
-***
-[hacs]: https://github.com/hacs/integration
-[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+# Platforms
+
+## Sensor
+The Blue Current integration provides the following sensors:
+### Charge point sensors
+- Activity
+- Average current
+- Average voltage
+- Energy usage in kWh
+- Max usage in Amps
+  - The max amps the charge point can use.
+- Offline since
+- Started on
+- Stopped on
+- Total cost in EUR
+- Total kW (estimate)
+- Vehicle status
+The following sensors are created as well, but disabled by default:
+- Current phase 1-3
+- offline max usage
+- remaining current
+- smart charging max usage
+- Voltage phase 1-3
+### Grid sensors
+- Grid average current
+- Grid max current
+The following sensors are created as well, but disabled by default:
+- Grid current phase 1-3
+
+## Switch
+The Blue Current integration provides the following switches:
+
+- Operative
+    - Enables or disables a charge point.
+- Plug and charge
+    - Allows you to start a session without having to scan a card.
+- Public charging
+    - Allows other people to use your charge point.
+
+## Button
+The Blue Current integration provides the following buttons:
+
+- Start session
+- Stop session
+- Reset
+- Reboot
