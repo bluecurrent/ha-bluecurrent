@@ -1,7 +1,7 @@
 {
     "name": "Blue Current",
     "hide_default_branch": true,
-    "homeassistant": "2022.2.0",
+    "homeassistant": "2023.4.3",
     "render_readme": true,
     "country": ["NL"]
 }
