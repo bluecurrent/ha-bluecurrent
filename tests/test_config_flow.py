@@ -277,3 +277,6 @@ async def test_flow_reauth(hass: HomeAssistant) -> None:
         assert result["type"] == FlowResultType.ABORT
         assert result["reason"] == "reauth_successful"
         assert entry.data.copy() == {"api_token": "1234567890"}
+
+        assert await entry.async_unload(hass)
+        await hass.async_block_till_done()
