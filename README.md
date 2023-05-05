@@ -1,47 +1,68 @@
-# Notice
+# Integration Blueprint
 
-The component and platforms in this repository are not meant to be used by a
-user, but as a "blueprint" that custom component developers can build
-upon, to make more awesome stuff.
+[![hacs_badge](https://img.shields.io/badge/HACS-Custom-41BDF5.svg?style=for-the-badge)](https://github.com/hacs/integration)
 
-HAVE FUN! 😎
+The Blue Current integration allows you to connect to your blue current account to Home Assistant and monitor your charge point(s).
 
-## Why?
 
-This is simple, by having custom_components look (README + structure) the same
-it is easier for developers to help each other and for users to start using them.
+## Prerequisites
+1. Log in to [my.bluecurrent](https://my.bluecurrent.nl/).
+2. Goto settings and enable developer mode.
+3. Generate an API token.
 
-If you are a developer and you want to add things to this "blueprint" that you think more
-developers will have use for, please open a PR to add it :)
 
-## What?
+## Installation
 
-This repository contains multiple files, here is a overview:
+-  [HACS](https://hacs.xyz/): add url https://github.com/bluecurrent/ha-bluecurrent as custom repository (HACS > Integration > option: Custom Repositories)
+- Restart Home Assistant.
+- Add 'Blue current' integration via HA Settings > 'Devices and Services' > 'Integrations'.
+- Provide your api key.
 
-File | Purpose | Documentation
--- | -- | --
-`.devcontainer.json` | Used for development/testing with Visual Studio Code. | [Documentation](https://code.visualstudio.com/docs/remote/containers)
-`.github/ISSUE_TEMPLATE/*.yml` | Templates for the issue tracker | [Documentation](https://help.github.com/en/github/building-a-strong-community/configuring-issue-templates-for-your-repository)
-`.vscode/tasks.json` | Tasks for the devcontainer. | [Documentation](https://code.visualstudio.com/docs/editor/tasks)
-`custom_components/integration_blueprint/*` | Integration files, this is where everything happens. | [Documentation](https://developers.home-assistant.io/docs/creating_component_index)
-`CONTRIBUTING.md` | Guidelines on how to contribute. | [Documentation](https://help.github.com/en/github/building-a-strong-community/setting-guidelines-for-repository-contributors)
-`LICENSE` | The license file for the project. | [Documentation](https://help.github.com/en/github/creating-cloning-and-archiving-repositories/licensing-a-repository)
-`README.md` | The file you are reading now, should contain info about the integration, installation and configuration instructions. | [Documentation](https://help.github.com/en/github/writing-on-github/basic-writing-and-formatting-syntax)
-`requirements.txt` | Python packages used for development/lint/testing this integration. | [Documentation](https://pip.pypa.io/en/stable/user_guide/#requirements-files)
+## Configuration is done in the UI
 
-## How?
+# Platforms
 
-1. Create a new repository in GitHub, using this repository as a template by clicking the "Use this template" button in the GitHub UI.
-1. Open your new repository in Visual Studio Code devcontainer (Preferably with the "`Dev Containers: Clone Repository in Named Container Volume...`" option).
-1. Rename all instances of the `integration_blueprint` to `custom_components/<your_integration_domain>` (e.g. `custom_components/awesome_integration`).
-1. Rename all instances of the `Integration Blueprint` to `<Your Integration Name>` (e.g. `Awesome Integration`).
-1. Run the `scrtipts/develop` to start HA and test out your new integration.
+## Sensor
+The Blue Current integration provides the following sensors:
+### Charge point sensors
+- Activity
+- Average current
+- Average voltage
+- Energy usage in kWh
+- Max usage in Amps
+  - The max amps the charge point can use.
+- Offline since
+- Started on
+- Stopped on
+- Total cost in EUR
+- Total kW (estimate)
+- Vehicle status
+The following sensors are created as well, but disabled by default:
+- Current phase 1-3
+- offline max usage
+- remaining current
+- smart charging max usage
+- Voltage phase 1-3
+### Grid sensors
+- Grid average current
+- Grid max current
+The following sensors are created as well, but disabled by default:
+- Grid current phase 1-3
 
-## Next steps
+## Switch
+The Blue Current integration provides the following switches:
 
-These are some next steps you may want to look into:
-- Add tests to your integration, [`pytest-homeassistant-custom-component`](https://github.com/MatthewFlamm/pytest-homeassistant-custom-component) can help you get started.
-- Add brand images (logo/icon) to https://github.com/home-assistant/brands.
-- Create your first release.
-- Share your integration on the [Home Assistant Forum](https://community.home-assistant.io/).
-- Submit your integration to the [HACS](https://hacs.xyz/docs/publish/start).
+- Operative
+    - Enables or disables a charge point.
+- Plug and charge
+    - Allows you to start a session without having to scan a card.
+- Public charging
+    - Allows other people to use your charge point.
+
+## Button
+The Blue Current integration provides the following buttons:
+
+- Start session
+- Stop session
+- Reset
+- Reboot

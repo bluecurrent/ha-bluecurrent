@@ -1,0 +1,80 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "data": {
+          "api_token": "[%key:common::config_flow::data::api_token%]",
+          "add_card": "Do you want to use your own charge card?"
+        },
+        "description": "Enter your Blue Current api token",
+        "title": "Authentication"
+      },
+      "card": {
+        "data": {
+          "card": "Card"
+        },
+        "description": "Enter the name of your charge card",
+        "title": "Card"
+      }
+    },
+    "error": {
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "limit_reached": "Request limit reached",
+      "invalid_token": "Invalid token",
+      "no_cards_found": "No charge cards found",
+      "already_connected": "IP is already connected",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+    }
+  },
+  "entity": {
+    "sensor": {
+      "activity": {
+        "state": {
+          "available": "Available",
+          "charging": "Charging",
+          "unavailable": "Unavailable",
+          "error": "Error",
+          "offline": "Offline"
+        }
+      },
+      "vehicle_status": {
+        "state": {
+          "standby": "Standby",
+          "vehicle_detected": "Detected",
+          "ready": "Ready",
+          "no_power": "No power",
+          "vehicle_error": "Error"
+        }
+      }
+    }
+  },
+  "device_automation": {
+    "condition_type": {
+      "available": "charge point is available",
+      "charging": "charge point is charging",
+      "error": "charge point has error",
+      "no_power": "vehicle has no power",
+      "offline": "charge point is offline",
+      "ready": "vehicle is ready",
+      "standby": "vehicle is in standby",
+      "unavailable": "charge point is unavailable",
+      "vehicle_detected": "vehicle is detected",
+      "vehicle_error": "vehicle has error"
+    },
+    "trigger_type": {
+      "available": "charge point becomes available",
+      "charging": "charge point started charging",
+      "error": "charge point has error",
+      "no_power": "vehicle has no power",
+      "offline": "charge point is offline",
+      "ready": "vehicle is ready",
+      "standby": "vehicle is in standby",
+      "unavailable": "charge point becomes unavailable",
+      "vehicle_detected": "vehicle is detected",
+      "vehicle_error": "vehicle has error"
+    }
+  }
+}

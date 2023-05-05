@@ -1,0 +1,35 @@
+reset:
+  name: Reset chargepoint
+  description: resets the chargepoint.
+  fields:
+    evse_id:
+      name: Id
+      description: chargepoint id
+      required: true
+
+reboot:
+  name: Reboot chargepoint
+  description: reboots the chargepoint.
+  fields:
+    evse_id:
+      name: Id
+      description: chargepoint id
+      required: true
+
+start_session:
+  name: start a charge session
+  description: starts a charge session.
+  fields:
+    evse_id:
+      name: Id
+      description: chargepoint id
+      required: true
+
+stop_session:
+  name: stop the charge session
+  description: stops the charge session.
+  fields:
+    id:
+      name: Id
+      description: chargepoint id
+      required: true
