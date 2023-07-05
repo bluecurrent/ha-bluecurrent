@@ -37,6 +37,7 @@ The Blue Current integration provides the following sensors:
 - Total cost in EUR
 - Total kW (estimate)
 - Vehicle status
+
 The following sensors are created as well, but disabled by default:
 - Current phase 1-3
 - offline max usage
@@ -46,6 +47,7 @@ The following sensors are created as well, but disabled by default:
 ### Grid sensors
 - Grid average current
 - Grid max current
+
 The following sensors are created as well, but disabled by default:
 - Grid current phase 1-3
 
