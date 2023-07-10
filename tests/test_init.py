@@ -54,12 +54,7 @@ async def test_config_not_ready(hass: HomeAssistant):
 async def test_set_entities_unavalible(hass: HomeAssistant):
     """Tests set_entities_unavailable."""
 
-    data = {
-        "101": {
-            "model_type": "hidden",
-            "evse_id": "101",
-        }
-    }
+    data = {"101": {"model_type": "hidden", "evse_id": "101", "name": ""}}
 
     charge_point = {
         "actual_v1": 14,
@@ -102,10 +97,10 @@ async def test_on_data(hass: HomeAssistant):
         # test CHARGE_POINTS
         data = {
             "object": "CHARGE_POINTS",
-            "data": [{"evse_id": "101", "model_type": "hidden"}],
+            "data": [{"evse_id": "101", "model_type": "hidden", "name": ""}],
         }
         await connector.on_data(data)
-        assert connector.charge_points == {"101": {"model_type": "hidden"}}
+        assert connector.charge_points == {"101": {"model_type": "hidden", "name": ""}}
 
         # test CH_STATUS
         data2 = {
@@ -131,13 +126,14 @@ async def test_on_data(hass: HomeAssistant):
         assert connector.charge_points == {
             "101": {
                 "model_type": "hidden",
+                "name": "",
                 "actual_v1": 12,
                 "actual_v2": 14,
                 "actual_v3": 15,
                 "actual_p1": 12,
                 "actual_p2": 14,
                 "actual_p3": 15,
-                "operative": True,
+                "block": False,
                 "activity": "charging",
                 "start_datetime": "2021-11-18T14:12:23",
                 "stop_datetime": "2021-11-18T14:32:23",
@@ -177,7 +173,7 @@ async def test_on_data(hass: HomeAssistant):
             "object": "CH_SETTINGS",
             "data": {
                 "plug_and_charge": False,
-                "public_charging": False,
+                "linked_charge_cards_only": False,
                 "evse_id": "101",
             },
         }
@@ -185,16 +181,16 @@ async def test_on_data(hass: HomeAssistant):
         assert connector.charge_points == {
             "101": {
                 "plug_and_charge": False,
-                "public_charging": False,
+                "linked_charge_cards_only": False,
             }
         }
         test_async_dispatcher_send.assert_called_with(
             hass, "blue_current_value_update_101"
         )
 
-        # test PUBLIC_CHARGING
+        # test LINKED_CHARGE_CARDS_ONLY
         data5: dict[str, Any] = {
-            "object": "PUBLIC_CHARGING",
+            "object": "LINKED_CHARGE_CARDS_ONLY",
             "result": True,
             "evse_id": "101",
         }
@@ -202,7 +198,7 @@ async def test_on_data(hass: HomeAssistant):
         assert connector.charge_points == {
             "101": {
                 "plug_and_charge": False,
-                "public_charging": True,
+                "linked_charge_cards_only": True,
             }
         }
         test_async_dispatcher_send.assert_called_with(
@@ -219,7 +215,7 @@ async def test_on_data(hass: HomeAssistant):
         assert connector.charge_points == {
             "101": {
                 "plug_and_charge": True,
-                "public_charging": True,
+                "linked_charge_cards_only": True,
             }
         }
         test_async_dispatcher_send.assert_called_with(

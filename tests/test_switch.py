@@ -12,11 +12,11 @@ from . import init_integration
 
 charge_point: dict[str, bool] = {
     "plug_and_charge": True,
-    "public_charging": False,
+    "linked_charge_cards_only": False,
 }
 
 data: dict[str, Any] = {
-    "101": {"model_type": "hidden", "evse_id": "101", **charge_point}
+    "101": {"model_type": "hidden", "evse_id": "101", "name": "", **charge_point}
 }
 
 
@@ -37,14 +37,14 @@ async def test_switches(hass: HomeAssistant):
         entry = entity_registry.async_get(f"switch.101_{key}")
         assert entry and entry.unique_id == f"{key}_101"
 
-    # operative
+    # block
     switches = er.async_entries_for_config_entry(entity_registry, "uuid")
     assert len(charge_point.keys()) == len(switches) - 1
 
-    state = hass.states.get("switch.101_operative")
+    state = hass.states.get("switch.101_block")
     assert state and state.state == "unavailable"
-    entry = entity_registry.async_get("switch.101_operative")
-    assert entry and entry.unique_id == "operative_101"
+    entry = entity_registry.async_get("switch.101_block")
+    assert entry and entry.unique_id == "block_101"
 
 
 async def test_toggle(hass: HomeAssistant):
@@ -52,39 +52,39 @@ async def test_toggle(hass: HomeAssistant):
 
     await init_integration(hass, "switch", data)
 
-    state = hass.states.get("switch.101_public_charging")
+    state = hass.states.get("switch.101_linked_charge_cards_only")
 
     assert state and state.state == "off"
     await hass.services.async_call(
         "switch",
         "turn_on",
-        {"entity_id": "switch.101_public_charging"},
+        {"entity_id": "switch.101_linked_charge_cards_only"},
         blocking=True,
     )
 
     connector: Connector = hass.data["blue_current"]["uuid"]
-    connector.charge_points = {"101": {"public_charging": True}}
+    connector.charge_points = {"101": {"linked_charge_cards_only": True}}
     async_dispatcher_send(hass, "blue_current_value_update_101")
 
     # wait
     await asyncio.sleep(1)
 
-    state = hass.states.get("switch.101_public_charging")
+    state = hass.states.get("switch.101_linked_charge_cards_only")
     assert state and state.state == "on"
 
     await hass.services.async_call(
         "switch",
         "turn_off",
-        {"entity_id": "switch.101_public_charging"},
+        {"entity_id": "switch.101_linked_charge_cards_only"},
         blocking=True,
     )
 
     connector2: Connector = hass.data["blue_current"]["uuid"]
-    connector2.charge_points = {"101": {"public_charging": False}}
+    connector2.charge_points = {"101": {"linked_charge_cards_only": False}}
     async_dispatcher_send(hass, "blue_current_value_update_101")
 
     # wait
     await asyncio.sleep(1)
 
-    state = hass.states.get("switch.101_public_charging")
+    state = hass.states.get("switch.101_linked_charge_cards_only")
     assert state and state.state == "off"

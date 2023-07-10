@@ -6,9 +6,13 @@ from typing import Any
 
 import voluptuous as vol
 from bluecurrent_api import Client
-from bluecurrent_api.exceptions import (AlreadyConnected, InvalidApiToken,
-                                        NoCardsFound, RequestLimitReached,
-                                        WebsocketException)
+from bluecurrent_api.exceptions import (
+    AlreadyConnected,
+    InvalidApiToken,
+    NoCardsFound,
+    RequestLimitReached,
+    WebsocketException,
+)
 from homeassistant import config_entries
 from homeassistant.const import CONF_API_TOKEN, CONF_NAME
 from homeassistant.data_entry_flow import FlowResult
@@ -37,7 +41,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.client = Client()
         errors = {}
         if user_input is not None:
-
             api_token = user_input[CONF_API_TOKEN]
             self._async_abort_entries_match({CONF_API_TOKEN: api_token})
 
@@ -57,7 +60,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "unknown"
 
             if not errors:
-
                 self.entry = await self.async_set_unique_id(email)
                 self.input = {CONF_API_TOKEN: api_token}
 
@@ -107,7 +109,6 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 return bool(card[CONF_NAME] == user_input[CARD])
 
             if user_input is not None:
-
                 selected_card = list(filter(check_card, cards))[0]
 
                 self.input[CARD] = selected_card["uid"]

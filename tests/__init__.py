@@ -31,11 +31,9 @@ async def init_integration(
         self.charge_points = data
         self.grid = grid
 
-    with patch(
-        "custom_components.blue_current.PLATFORMS", [platform]
-    ), patch.object(Connector, "__init__", init), patch(
-        "custom_components.blue_current.Client", autospec=True
-    ):
+    with patch("custom_components.blue_current.PLATFORMS", [platform]), patch.object(
+        Connector, "__init__", init
+    ), patch("custom_components.blue_current.Client", autospec=True):
         config_entry = MockConfigEntry(
             domain=DOMAIN,
             entry_id="uuid",

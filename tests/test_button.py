@@ -9,12 +9,7 @@ from homeassistant.util import dt as dt_util
 
 from . import init_integration
 
-data = {
-    "101": {
-        "model_type": "hidden",
-        "evse_id": "101",
-    }
-}
+data = {"101": {"model_type": "hidden", "evse_id": "101", "name": ""}}
 
 buttons = ("start_session", "stop_session", "reset", "reboot")
 

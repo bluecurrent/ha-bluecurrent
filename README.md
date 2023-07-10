@@ -54,12 +54,12 @@ The following sensors are created as well, but disabled by default:
 ## Switch
 The Blue Current integration provides the following switches:
 
-- Operative
+- Block
     - Enables or disables a charge point.
 - Plug and charge
     - Allows you to start a session without having to scan a card.
-- Public charging
-    - Allows other people to use your charge point.
+- Linked charge cards only
+    - Toggles if the chargepoint is usable with unlinked charge cards.
 
 ## Button
 The Blue Current integration provides the following buttons:
