@@ -1,8 +1,11 @@
 """Support for Blue Current buttons."""
 from __future__ import annotations
 
-from homeassistant.components.button import (ButtonEntity,
-                                             ButtonEntityDescription)
+from homeassistant.components.button import (
+    ButtonEntity,
+    ButtonEntityDescription,
+    ButtonDeviceClass,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -13,10 +16,18 @@ from .entity import BlueCurrentEntity
 
 BUTTONS = (
     ButtonEntityDescription(
-        key="reset", name="Reset", icon="mdi:restart", has_entity_name=True
+        key="reset",
+        name="Reset",
+        icon="mdi:restart",
+        has_entity_name=True,
+        device_class=ButtonDeviceClass.RESTART,
     ),
     ButtonEntityDescription(
-        key="reboot", name="Reboot", icon="mdi:restart-alert", has_entity_name=True
+        key="reboot",
+        name="Reboot",
+        icon="mdi:restart-alert",
+        has_entity_name=True,
+        device_class=ButtonDeviceClass.RESTART,
     ),
     ButtonEntityDescription(
         key="start_session", name="Start session", icon="mdi:play", has_entity_name=True

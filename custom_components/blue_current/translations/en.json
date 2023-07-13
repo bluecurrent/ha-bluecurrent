@@ -21,7 +21,7 @@
             },
             "user": {
                 "data": {
-                    "add_card": "Do you want to use your own charge card?",
+                    "add_card": "Do you want to use your own charge card? (without a charge card sessions will not be charged to your account)",
                     "api_token": "API Token"
                 },
                 "description": "Enter your Blue Current api token",

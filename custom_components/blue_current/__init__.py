@@ -6,12 +6,19 @@ from datetime import datetime
 from typing import Any
 
 from bluecurrent_api import Client
-from bluecurrent_api.exceptions import (BlueCurrentException, InvalidApiToken,
-                                        RequestLimitReached,
-                                        WebsocketException)
+from bluecurrent_api.exceptions import (
+    BlueCurrentException,
+    InvalidApiToken,
+    RequestLimitReached,
+    WebsocketError,
+)
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import (CONF_API_TOKEN, EVENT_HOMEASSISTANT_STOP,
-                                 Platform)
+from homeassistant.const import (
+    CONF_API_TOKEN,
+    EVENT_HOMEASSISTANT_STOP,
+    Platform,
+    ATTR_NAME,
+)
 from homeassistant.core import Event, HomeAssistant, ServiceCall
 from homeassistant.exceptions import ConfigEntryAuthFailed, ConfigEntryNotReady
 from homeassistant.helpers import entity_registry
@@ -20,6 +27,7 @@ from homeassistant.helpers.event import async_call_later
 
 from .const import CARD, DOMAIN, EVSE_ID, LOGGER, MODEL_TYPE
 
+# websocket.URL = "wss://bo-acct001.bluecurrent.nl/haserver"
 PLATFORMS = [Platform.SENSOR, Platform.SWITCH, Platform.BUTTON]
 CHARGE_POINTS = "CHARGE_POINTS"
 DATA = "data"
@@ -29,11 +37,11 @@ LARGE_DELAY = 20
 GRID = "GRID"
 OBJECT = "object"
 VALUE_TYPES = ("CH_STATUS", "CH_SETTINGS")
-SETTINGS = ("PUBLIC_CHARGING", "PLUG_AND_CHARGE")
+SETTINGS = ("LINKED_CHARGE_CARDS_ONLY", "PLUG_AND_CHARGE")
 RESULT = "result"
 ACTIVITY = "activity"
 UNAVAILABLE = "unavailable"
-OPERATIVE = "operative"
+BLOCK = "block"
 SERVICES = ("SOFT_RESET", "REBOOT", "START_SESSION", "STOP_SESSION")
 SUCCESS = "success"
 RESET = "reset"
@@ -137,7 +145,8 @@ class Connector:
             for entry in data:
                 evse_id = entry[EVSE_ID]
                 model = entry[MODEL_TYPE]
-                self.add_charge_point(evse_id, model)
+                name = entry[ATTR_NAME]
+                self.add_charge_point(evse_id, model, name)
                 await self.get_charge_point_data(evse_id)
             await self.client.get_grid_status(data[0][EVSE_ID])
 
@@ -181,9 +190,9 @@ class Connector:
         await self.client.get_status(evse_id)
         await self.client.get_settings(evse_id)
 
-    def add_charge_point(self, evse_id: str, model: str) -> None:
+    def add_charge_point(self, evse_id: str, model: str, name: str) -> None:
         """Add a charge point to charge_points."""
-        self.charge_points[evse_id] = {MODEL_TYPE: model}
+        self.charge_points[evse_id] = {MODEL_TYPE: model, ATTR_NAME: name}
 
     def update_charge_point(self, evse_id: str, data: dict) -> None:
         """Update the charge point data."""
@@ -191,9 +200,9 @@ class Connector:
         def handle_activity(data: dict) -> None:
             activity = data.get(ACTIVITY)
             if activity != UNAVAILABLE:
-                data[OPERATIVE] = True
+                data[BLOCK] = False
             else:
-                data[OPERATIVE] = False
+                data[BLOCK] = True
 
         if ACTIVITY in data:
             handle_activity(data)
@@ -233,11 +242,11 @@ class Connector:
             async_call_later(
                 self.hass, self.client.get_next_reset_delta(), self.reconnect
             )
-        except WebsocketException:
+        except WebsocketError:
             set_entities_unavalible(self.hass, self.config.entry_id)
             async_call_later(self.hass, LARGE_DELAY, self.reconnect)
 
     async def disconnect(self) -> None:
         """Disconnect from the websocket."""
-        with suppress(WebsocketException):
+        with suppress(WebsocketError):
             await self.client.disconnect()

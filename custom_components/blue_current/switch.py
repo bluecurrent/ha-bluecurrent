@@ -6,8 +6,11 @@ from dataclasses import dataclass
 from typing import Any
 
 from bluecurrent_api import Client
-from homeassistant.components.switch import (SwitchDeviceClass, SwitchEntity,
-                                             SwitchEntityDescription)
+from homeassistant.components.switch import (
+    SwitchDeviceClass,
+    SwitchEntity,
+    SwitchEntityDescription,
+)
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
@@ -43,21 +46,21 @@ SWITCHES: tuple[BlueCurrentSwitchEntityDescription, ...] = (
         has_entity_name=True,
     ),
     BlueCurrentSwitchEntityDescription(
-        key="public_charging",
+        key="linked_charge_cards_only",
         device_class=SwitchDeviceClass.SWITCH,
-        name="Public charging",
+        name="Linked charge cards only",
         icon="mdi:account-group",
-        function=lambda client, evse_id, value: client.set_public_charging(
+        function=lambda client, evse_id, value: client.set_linked_charge_cards_only(
             evse_id, value
         ),
         has_entity_name=True,
     ),
     BlueCurrentSwitchEntityDescription(
-        key="operative",
+        key="block",
         device_class=SwitchDeviceClass.SWITCH,
-        name="Operative",
-        icon="mdi:power",
-        function=lambda client, evse_id, value: client.set_operative(evse_id, value),
+        name="Block",
+        icon="mdi:lock",
+        function=lambda client, evse_id, value: client.block(evse_id, value),
         has_entity_name=True,
     ),
 )
