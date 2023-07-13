@@ -11,10 +11,10 @@ from bluecurrent_api.exceptions import (
     InvalidApiToken,
     NoCardsFound,
     RequestLimitReached,
-    WebsocketException,
+    WebsocketError,
 )
 from homeassistant import config_entries
-from homeassistant.const import CONF_API_TOKEN, CONF_NAME
+from homeassistant.const import CONF_API_TOKEN, CONF_ID
 from homeassistant.data_entry_flow import FlowResult
 
 from .const import CARD, DOMAIN, LOGGER
@@ -47,7 +47,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             try:
                 await self.client.validate_api_token(api_token)
                 email = await self.client.get_email()
-            except WebsocketException:
+            except WebsocketError:
                 errors["base"] = "cannot_connect"
             except RequestLimitReached:
                 errors["base"] = "limit_reached"
@@ -88,7 +88,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         api_token = self.input[CONF_API_TOKEN]
         try:
             cards = await self.client.get_charge_cards()
-        except WebsocketException:
+        except WebsocketError:
             errors["base"] = "cannot_connect"
         except NoCardsFound:
             errors["base"] = "no_cards_found"
@@ -101,12 +101,12 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors["base"] = "unknown"
 
         if not errors:
-            card_names = [card[CONF_NAME] for card in cards]
-            card_schema = vol.Schema({vol.Required(CARD): vol.In(card_names)})
+            card_ids = [card[CONF_ID] for card in cards]
+            card_schema = vol.Schema({vol.Required(CARD): vol.In(card_ids)})
 
             def check_card(card: dict) -> bool:
-                assert user_input is not None
-                return bool(card[CONF_NAME] == user_input[CARD])
+                # assert user_input is not None
+                return bool(card[CONF_ID] == user_input[CARD])
 
             if user_input is not None:
                 selected_card = list(filter(check_card, cards))[0]

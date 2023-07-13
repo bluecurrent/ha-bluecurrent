@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 from bluecurrent_api.client import Client
-from bluecurrent_api.exceptions import RequestLimitReached, WebsocketException
+from bluecurrent_api.exceptions import RequestLimitReached, WebsocketError
 from homeassistant.config_entries import ConfigEntryState
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -35,10 +35,10 @@ async def test_load_unload_entry(hass: HomeAssistant):
 
 
 async def test_config_not_ready(hass: HomeAssistant):
-    """Tests if ConfigEntryNotReady is raised when connect raises a WebsocketException."""
+    """Tests if ConfigEntryNotReady is raised when connect raises a WebsocketError."""
     with patch(
         "bluecurrent_api.Client.connect",
-        side_effect=WebsocketException,
+        side_effect=WebsocketError,
     ), pytest.raises(ConfigEntryNotReady):
         config_entry = MockConfigEntry(
             domain=DOMAIN,
@@ -248,7 +248,7 @@ async def test_start_loop(hass: HomeAssistant):
 
         with patch(
             "bluecurrent_api.Client.start_loop",
-            side_effect=WebsocketException("unknown command"),
+            side_effect=WebsocketError("unknown command"),
         ):
             await connector.start_loop()
             test_async_call_later.assert_called_with(hass, 1, connector.reconnect)
@@ -264,7 +264,7 @@ async def test_reconnect(hass: HomeAssistant):
     """Tests reconnect."""
 
     with patch("bluecurrent_api.Client.connect"), patch(
-        "bluecurrent_api.Client.connect", side_effect=WebsocketException
+        "bluecurrent_api.Client.connect", side_effect=WebsocketError
     ), patch(
         "bluecurrent_api.Client.get_next_reset_delta", return_value=timedelta(hours=1)
     ), patch(

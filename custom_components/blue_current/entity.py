@@ -1,4 +1,4 @@
-"""Enitiy r."""
+"""Entity representing a Blue Current charge point."""
 from homeassistant.core import callback
 from homeassistant.const import ATTR_NAME
 from homeassistant.helpers.dispatcher import async_dispatcher_connect

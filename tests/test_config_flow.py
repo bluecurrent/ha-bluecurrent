@@ -14,7 +14,7 @@ from custom_components.blue_current.config_flow import (
     InvalidApiToken,
     NoCardsFound,
     RequestLimitReached,
-    WebsocketException,
+    WebsocketError,
 )
 
 
@@ -64,7 +64,7 @@ async def test_user_card(hass: HomeAssistant) -> None:
         return_value=True,
     ), patch("bluecurrent_api.Client.get_email", return_value="test@email.com"), patch(
         "bluecurrent_api.Client.get_charge_cards",
-        return_value=[{"name": "card 1", "uid": 1}, {"name": "card 2", "uid": 2}],
+        return_value=[{"id": "card 1", "uid": 1}, {"id": "card 2", "uid": 2}],
     ), patch(
         "custom_components.blue_current.async_setup_entry",
         return_value=True,
@@ -77,7 +77,7 @@ async def test_user_card(hass: HomeAssistant) -> None:
 
     with patch(
         "bluecurrent_api.Client.get_charge_cards",
-        return_value=[{"name": "card 1", "uid": 1}, {"name": "card 2", "uid": 2}],
+        return_value=[{"id": "card 1", "uid": 1}, {"id": "card 2", "uid": 2}],
     ), patch(
         "custom_components.blue_current.async_setup_entry",
         return_value=True,
@@ -153,7 +153,7 @@ async def test_form_cannot_connect(hass: HomeAssistant) -> None:
 
     with patch(
         "bluecurrent_api.Client.validate_api_token",
-        side_effect=WebsocketException,
+        side_effect=WebsocketError,
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,
@@ -190,7 +190,7 @@ async def test_form_cannot_connect_card(hass: HomeAssistant) -> None:
         return_value=True,
     ), patch("bluecurrent_api.Client.get_email", return_value="test@email.com"), patch(
         "bluecurrent_api.Client.get_charge_cards",
-        side_effect=WebsocketException,
+        side_effect=WebsocketError,
     ):
         result = await hass.config_entries.flow.async_init(
             DOMAIN,

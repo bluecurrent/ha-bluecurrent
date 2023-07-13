@@ -5,12 +5,12 @@ from contextlib import suppress
 from datetime import datetime
 from typing import Any
 
-from bluecurrent_api import Client, websocket
+from bluecurrent_api import Client
 from bluecurrent_api.exceptions import (
     BlueCurrentException,
     InvalidApiToken,
     RequestLimitReached,
-    WebsocketException,
+    WebsocketError,
 )
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
@@ -27,7 +27,7 @@ from homeassistant.helpers.event import async_call_later
 
 from .const import CARD, DOMAIN, EVSE_ID, LOGGER, MODEL_TYPE
 
-websocket.URL = "wss://bo-acct001.bluecurrent.nl/haserver"
+# websocket.URL = "wss://bo-acct001.bluecurrent.nl/haserver"
 PLATFORMS = [Platform.SENSOR, Platform.SWITCH, Platform.BUTTON]
 CHARGE_POINTS = "CHARGE_POINTS"
 DATA = "data"
@@ -242,11 +242,11 @@ class Connector:
             async_call_later(
                 self.hass, self.client.get_next_reset_delta(), self.reconnect
             )
-        except WebsocketException:
+        except WebsocketError:
             set_entities_unavalible(self.hass, self.config.entry_id)
             async_call_later(self.hass, LARGE_DELAY, self.reconnect)
 
     async def disconnect(self) -> None:
         """Disconnect from the websocket."""
-        with suppress(WebsocketException):
+        with suppress(WebsocketError):
             await self.client.disconnect()
