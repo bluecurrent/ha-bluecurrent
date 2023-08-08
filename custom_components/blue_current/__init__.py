@@ -25,9 +25,8 @@ from homeassistant.helpers import entity_registry
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.event import async_call_later
 
-from .const import CARD, DOMAIN, EVSE_ID, LOGGER, MODEL_TYPE
+from .const import ACTIVITY, CARD, DOMAIN, EVSE_ID, LOGGER, MODEL_TYPE
 
-# websocket.URL = "wss://bo-acct001.bluecurrent.nl/haserver"
 PLATFORMS = [Platform.SENSOR, Platform.SWITCH, Platform.BUTTON]
 CHARGE_POINTS = "CHARGE_POINTS"
 DATA = "data"
@@ -39,7 +38,6 @@ OBJECT = "object"
 VALUE_TYPES = ("CH_STATUS", "CH_SETTINGS")
 SETTINGS = ("LINKED_CHARGE_CARDS_ONLY", "PLUG_AND_CHARGE")
 RESULT = "result"
-ACTIVITY = "activity"
 UNAVAILABLE = "unavailable"
 BLOCK = "block"
 SERVICES = ("SOFT_RESET", "REBOOT", "START_SESSION", "STOP_SESSION")
@@ -230,7 +228,7 @@ class Connector:
 
             async_call_later(self.hass, SMALL_DELAY, self.reconnect)
 
-    async def reconnect(self, event_time: datetime | None = None) -> None:
+    async def reconnect(self, _event_time: datetime | None = None) -> None:
         """Keep trying to reconnect to the websocket."""
         try:
             await self.connect(self.config.data[CONF_API_TOKEN])

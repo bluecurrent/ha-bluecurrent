@@ -16,8 +16,10 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
 from . import Connector
-from .const import DOMAIN, LOGGER
+from .const import ACTIVITY, DOMAIN, LOGGER
 from .entity import BlueCurrentEntity
+
+AVAILABLE = "available"
 
 
 @dataclass
@@ -131,8 +133,11 @@ class ChargePointSwitch(BlueCurrentEntity, SwitchEntity):
     def update_from_latest_data(self) -> None:
         """Fetch new state data for the switch."""
         new_value = self.connector.charge_points[self.evse_id].get(self.key)
-        if new_value is not None:
+        activity = self.connector.charge_points[self.evse_id].get(ACTIVITY)
+
+        if new_value is not None and activity == AVAILABLE:
+            self._attr_is_on = new_value = new_value
             self._attr_available = True
-            self._attr_is_on = new_value
+
         else:
             self._attr_available = False
