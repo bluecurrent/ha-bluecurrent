@@ -136,7 +136,7 @@ class ChargePointSwitch(BlueCurrentEntity, SwitchEntity):
         activity = self.connector.charge_points[self.evse_id].get(ACTIVITY)
 
         if new_value is not None and activity == AVAILABLE:
-            self._attr_is_on = new_value = new_value
+            self._attr_is_on = new_value
             self._attr_available = True
 
         else:
