@@ -16,7 +16,13 @@ charge_point: dict[str, bool] = {
 }
 
 data: dict[str, Any] = {
-    "101": {"model_type": "hidden", "evse_id": "101", "name": "", **charge_point}
+    "101": {
+        "model_type": "hidden",
+        "evse_id": "101",
+        "name": "",
+        "activity": "available",
+        **charge_point,
+    }
 }
 
 
@@ -63,7 +69,9 @@ async def test_toggle(hass: HomeAssistant):
     )
 
     connector: Connector = hass.data["blue_current"]["uuid"]
-    connector.charge_points = {"101": {"linked_charge_cards_only": True}}
+    connector.charge_points = {
+        "101": {"activity": "available", "linked_charge_cards_only": True}
+    }
     async_dispatcher_send(hass, "blue_current_value_update_101")
 
     # wait
@@ -79,8 +87,9 @@ async def test_toggle(hass: HomeAssistant):
         blocking=True,
     )
 
-    connector2: Connector = hass.data["blue_current"]["uuid"]
-    connector2.charge_points = {"101": {"linked_charge_cards_only": False}}
+    connector.charge_points = {
+        "101": {"activity": "available", "linked_charge_cards_only": False}
+    }
     async_dispatcher_send(hass, "blue_current_value_update_101")
 
     # wait
@@ -88,3 +97,14 @@ async def test_toggle(hass: HomeAssistant):
 
     state = hass.states.get("switch.101_linked_charge_cards_only")
     assert state and state.state == "off"
+
+    connector.charge_points = {
+        "101": {"activity": "charging", "linked_charge_cards_only": False}
+    }
+    async_dispatcher_send(hass, "blue_current_value_update_101")
+
+    # wait
+    await asyncio.sleep(1)
+
+    state = hass.states.get("switch.101_linked_charge_cards_only")
+    assert state and state.state == "unavailable"
