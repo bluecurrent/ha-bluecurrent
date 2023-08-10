@@ -1,5 +1,6 @@
 """The tests for Blue Current device triggers."""
 import pytest
+from pytest_unordered import unordered
 from homeassistant.components import automation
 from homeassistant.components.device_automation import DeviceAutomationType
 from homeassistant.core import HomeAssistant
@@ -7,7 +8,6 @@ from homeassistant.helpers import device_registry, entity_registry
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    assert_lists_same,
     async_get_device_automations,
     async_mock_service,
     mock_device_registry,
@@ -137,7 +137,7 @@ async def test_get_triggers(
     triggers = await async_get_device_automations(
         hass, DeviceAutomationType.TRIGGER, device_entry.id
     )
-    assert_lists_same(triggers, expected_triggers)
+    unordered(triggers, expected_triggers)
 
 
 async def test_if_activity_fires_on_state_change(hass: HomeAssistant, calls):

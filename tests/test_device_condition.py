@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import pytest
+from pytest_unordered import unordered
 from homeassistant.components import automation
 from homeassistant.components.device_automation import DeviceAutomationType
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -9,7 +10,6 @@ from homeassistant.helpers import device_registry, entity_registry
 from homeassistant.setup import async_setup_component
 from pytest_homeassistant_custom_component.common import (
     MockConfigEntry,
-    assert_lists_same,
     async_get_device_automations,
     async_mock_service,
     mock_device_registry,
@@ -139,7 +139,7 @@ async def test_get_conditions(
     conditions = await async_get_device_automations(
         hass, DeviceAutomationType.CONDITION, device_entry.id
     )
-    assert_lists_same(conditions, expected_conditions)
+    unordered(conditions, expected_conditions)
 
 
 async def test_if_actvivity_state(
