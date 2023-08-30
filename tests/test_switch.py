@@ -99,7 +99,11 @@ async def test_toggle(hass: HomeAssistant):
     assert state and state.state == "off"
 
     connector.charge_points = {
-        "101": {"activity": "charging", "linked_charge_cards_only": False, "block": False}
+        "101": {
+            "activity": "charging",
+            "linked_charge_cards_only": False,
+            "block": False,
+        }
     }
     async_dispatcher_send(hass, "blue_current_value_update_101")
 

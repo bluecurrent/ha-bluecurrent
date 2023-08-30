@@ -20,7 +20,8 @@ from .const import ACTIVITY, DOMAIN, LOGGER
 from .entity import BlueCurrentEntity
 
 AVAILABLE = "available"
-BLOCK = 'block'
+BLOCK = "block"
+
 
 @dataclass
 class BlueCurrentSwitchEntityDescriptionMixin:
