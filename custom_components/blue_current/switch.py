@@ -20,6 +20,7 @@ from .const import ACTIVITY, DOMAIN, LOGGER
 from .entity import BlueCurrentEntity
 
 AVAILABLE = "available"
+BLOCK = "block"
 
 
 @dataclass
@@ -135,8 +136,8 @@ class ChargePointSwitch(BlueCurrentEntity, SwitchEntity):
         new_value = self.connector.charge_points[self.evse_id].get(self.key)
         activity = self.connector.charge_points[self.evse_id].get(ACTIVITY)
 
-        if new_value is not None and activity == AVAILABLE:
-            self._attr_is_on = new_value
+        if new_value is not None and (activity == AVAILABLE or self.key == BLOCK):
+            self._attr_is_on = new_value = new_value
             self._attr_available = True
 
         else:

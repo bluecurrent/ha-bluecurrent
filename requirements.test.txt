@@ -2,4 +2,4 @@ pytest
 pytest_unordered
 pytest-cov
 pytest-asyncio
-pytest-homeassistant-custom-component>=0.13.20
+pytest-homeassistant-custom-component>=0.13.53
