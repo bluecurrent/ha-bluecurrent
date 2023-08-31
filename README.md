@@ -6,9 +6,10 @@ The Blue Current integration allows you to connect to your blue current account 
 
 
 ## Prerequisites
-1. Log in to [my.bluecurrent](https://my.bluecurrent.nl/).
-2. Goto settings and enable developer mode.
-3. Generate an API token.
+1. ~~Log in to [my.bluecurrent](https://my.bluecurrent.nl/).~~
+2. ~~Goto settings and enable developer mode.~~
+3. ~~Generate an API token.~~
+4. The developer mode will be added soon. For now you can email samen@bluecurrent.nl and ask for an api token for Home Assistant.
 
 
 ## Installation
