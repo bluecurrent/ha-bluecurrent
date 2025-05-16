@@ -1,7 +1,7 @@
 {
     "name": "bluecurrent/ha-bluecurrent",
-    "image": "mcr.microsoft.com/vscode/devcontainers/python:0-3.11",
-    "postCreateCommand": "scripts/setup",
+    "image": "mcr.microsoft.com/vscode/devcontainers/python:3.13",
+    "postCreateCommand": "scripts/setup && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && . $HOME/.cargo/env",
     "forwardPorts": [
         8123
     ],
@@ -29,8 +29,5 @@
             }
         }
     },
-    "remoteUser": "vscode",
-    "features": {
-        "rust": "latest"
-    }
+    "remoteUser": "vscode"
 }
