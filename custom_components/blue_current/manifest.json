@@ -1,11 +1,16 @@
 {
-  "domain": "blue_current",
+  "domain": "blue_current_hacs",
   "name": "Blue Current",
-  "codeowners": ["@Floris272", "@gleeuwen"],
+  "codeowners": [
+    "@Floris272",
+    "@gleeuwen"
+  ],
   "config_flow": true,
-  "documentation": "https://www.home-assistant.io/integrations/blue_current",
+  "documentation": "https://github.com/yourusername/ha-bluecurrent",
   "iot_class": "cloud_push",
   "issue_tracker": "https://github.com/bluecurrent/ha-bluecurrent/issues",
-  "requirements": ["bluecurrent-api==1.0.5"],
+  "requirements": [
+    "bluecurrent-api==1.0.5"
+  ],
   "version": "1.0.0"
 }
