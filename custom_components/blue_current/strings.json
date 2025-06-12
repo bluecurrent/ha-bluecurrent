@@ -3,78 +3,127 @@
     "step": {
       "user": {
         "data": {
-          "api_token": "[%key:common::config_flow::data::api_token%]",
-          "add_card": "Do you want to use your own charge card? (without a charge card sessions will not be charged to your account)"
+          "api_token": "[%key:common::config_flow::data::api_token%]"
         },
-        "description": "Enter your Blue Current api token",
+        "description": "Enter your Blue Current API token",
         "title": "Authentication"
-      },
-      "card": {
-        "data": {
-          "card": "Card"
-        },
-        "description": "Enter the name of your charge card",
-        "title": "Card"
       }
     },
     "error": {
       "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
       "limit_reached": "Request limit reached",
       "invalid_token": "Invalid token",
-      "no_cards_found": "No charge cards found",
-      "already_connected": "IP is already connected",
+      "already_connected": "Already connected",
       "unknown": "[%key:common::config_flow::error::unknown%]"
     },
     "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_device%]"
+      "already_configured": "[%key:common::config_flow::abort::already_configured_account%]",
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
+      "wrong_account": "Wrong account: Please authenticate with the API token for {email}."
     }
   },
   "entity": {
     "sensor": {
       "activity": {
+        "name": "Activity",
         "state": {
           "available": "Available",
-          "charging": "Charging",
+          "charging": "[%key:common::state::charging%]",
           "unavailable": "Unavailable",
-          "error": "Error",
+          "error": "[%key:common::state::error%]",
           "offline": "Offline"
         }
       },
       "vehicle_status": {
+        "name": "Vehicle status",
         "state": {
-          "standby": "Standby",
+          "standby": "[%key:common::state::standby%]",
           "vehicle_detected": "Detected",
           "ready": "Ready",
           "no_power": "No power",
-          "vehicle_error": "Error"
+          "vehicle_error": "[%key:common::state::error%]"
         }
+      },
+      "actual_v1": {
+        "name": "Voltage phase 1"
+      },
+      "actual_v2": {
+        "name": "Voltage phase 2"
+      },
+      "actual_v3": {
+        "name": "Voltage phase 3"
+      },
+      "avg_voltage": {
+        "name": "Average voltage"
+      },
+      "actual_p1": {
+        "name": "Current phase 1"
+      },
+      "actual_p2": {
+        "name": "Current phase 2"
+      },
+      "actual_p3": {
+        "name": "Current phase 3"
+      },
+      "avg_current": {
+        "name": "Average current"
+      },
+      "total_kw": {
+        "name": "Total power"
+      },
+      "actual_kwh": {
+        "name": "Energy usage"
+      },
+      "start_datetime": {
+        "name": "Started on"
+      },
+      "stop_datetime": {
+        "name": "Stopped on"
+      },
+      "offline_since": {
+        "name": "Offline since"
+      },
+      "total_cost": {
+        "name": "Total cost"
+      },
+      "max_usage": {
+        "name": "Max usage"
+      },
+      "smartcharging_max_usage": {
+        "name": "Smart charging max usage"
+      },
+      "max_offline": {
+        "name": "Offline max usage"
+      },
+      "current_left": {
+        "name": "Remaining current"
+      },
+      "grid_actual_p1": {
+        "name": "Grid current phase 1"
+      },
+      "grid_actual_p2": {
+        "name": "Grid current phase 2"
+      },
+      "grid_actual_p3": {
+        "name": "Grid current phase 3"
+      },
+      "grid_avg_current": {
+        "name": "Average grid current"
+      },
+      "grid_max_current": {
+        "name": "Max grid current"
       }
-    }
-  },
-  "device_automation": {
-    "condition_type": {
-      "available": "charge point is available",
-      "charging": "charge point is charging",
-      "error": "charge point has error",
-      "no_power": "vehicle has no power",
-      "offline": "charge point is offline",
-      "ready": "vehicle is ready",
-      "standby": "vehicle is in standby",
-      "unavailable": "charge point is unavailable",
-      "vehicle_detected": "vehicle is detected",
-      "vehicle_error": "vehicle has error"
     },
-    "trigger_type": {
-      "available": "charge point becomes available",
-      "charging": "charge point started charging",
-      "error": "charge point has error",
-      "no_power": "vehicle has no power",
-      "offline": "charge point is offline",
-      "ready": "vehicle is ready",
-      "standby": "vehicle is in standby",
-      "unavailable": "charge point becomes unavailable",
-      "vehicle_detected": "vehicle is detected",
-      "vehicle_error": "vehicle has error"
+    "button": {
+      "stop_charge_session": {
+        "name": "Stop charge session"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
+      "reset": {
+        "name": "Reset"
+      }
     }
   }
 }
