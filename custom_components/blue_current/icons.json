@@ -19,7 +19,7 @@
       "current_left": {
         "default": "mdi:gauge"
       }
-    },  
+    },
     "button": {
       "reset": {
         "default": "mdi:restart"
@@ -41,6 +41,11 @@
       "block": {
         "default": "mdi:lock"
       }
+    }
+  },
+  "services": {
+    "start_charge_session": {
+      "service": "mdi:play"
     }
   }
 }
