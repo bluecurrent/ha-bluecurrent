@@ -4,6 +4,10 @@
 
 The Blue Current integration allows you to connect to your blue current account to Home Assistant and monitor your charge point(s).
 
+> [!IMPORTANT]
+> This Blue Current HACS integration may include new, unstable experimental beta features, which are subject to change or removal in future updates.
+>
+> For a **stable version of the Blue Current integration**, install it directly from Home Assistant (more information can be found [here](https://www.home-assistant.io/integrations/blue_current/)).
 
 ## Prerequisites
 1. Log in to [my.bluecurrent.nl](https://my.bluecurrent.nl/).
@@ -56,17 +60,28 @@ The following sensors are created as well, but disabled by default:
 ## Switch
 The Blue Current integration provides the following switches:
 
-- Block
-    - Enables or disables a charge point.
-- Plug and charge
-    - Allows you to start a session without having to scan a card.
-- Linked charge cards only
-    - Toggles if the chargepoint is usable with unlinked charge cards.
+- Toggle Plug & Charge
+  - Allows you to start a session without having to scan a card.
+- Toggle linked charging cards only
+  - When enabled, visitors can't make use of the charge point. Only linked charging cards are allowed.
+- Toggle charge point block
+  - Enables or disables a charge point.
 
 ## Button
 The Blue Current integration provides the following buttons:
 
-- Start session
 - Stop session
 - Reset
 - Reboot
+
+## Actions
+The following actions are provided by the Blue Current integration:
+
+### Action start_charge_session
+
+Starts a new charge session. When no charging card ID is provided, no charging card will be used.
+
+| Data attribute | Optional | Description |
+| -------------- | -------- | ----------- |
+| `device_id` | no | Charge point device ID |
+| `charging_card_id` | yes | Charging card ID that will be used to start a charge session. |
