@@ -114,7 +114,7 @@ SENSORS = (
     SensorEntityDescription(
         key="activity",
         device_class=SensorDeviceClass.ENUM,
-        options=["available", "charging", "unavailable", "error", "offline"],
+        options=["available", "charging", "unavailable", "error", "offline", "delayed"],
         translation_key="activity",
     ),
     SensorEntityDescription(

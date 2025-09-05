@@ -13,10 +13,21 @@ from homeassistant.components.button import (
     ButtonEntity,
     ButtonEntityDescription,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
-from . import BlueCurrentConfigEntry, Connector
+from . import EVSE_ID, BlueCurrentConfigEntry, Connector
+from .const import (
+    ACTIVITY,
+    CHARGING,
+    DELAYED,
+    DELAYED_CHARGING,
+    PRICE_BASED_CHARGING,
+    SMART_CHARGING,
+    VALUE,
+    VEHICLE_ERROR,
+    VEHICLE_STATUS,
+)
 from .entity import ChargepointEntity
 
 
@@ -24,26 +35,60 @@ from .entity import ChargepointEntity
 class ChargePointButtonEntityDescription(ButtonEntityDescription):
     """Describes a Blue Current button entity."""
 
-    function: Callable[[Client, str], Coroutine[Any, Any, None]]
+    function: Callable[[Client, dict[str, Any]], Coroutine[Any, Any, None]]
+    is_button_available: Callable[[dict[str, Any]], bool] | None = None
+
+
+async def boost_charge_session(client: Client, charge_point: dict[str, Any]) -> None:
+    """Override the smart charging profile, if active."""
+    if charge_point[SMART_CHARGING]:
+        if charge_point[PRICE_BASED_CHARGING][VALUE]:
+            await client.override_price_based_charging_profile(
+                charge_point[EVSE_ID], True
+            )
+        if charge_point[DELAYED_CHARGING][VALUE]:
+            await client.override_delayed_charging_profile(charge_point[EVSE_ID], True)
+
+
+def check_boost_availability(charge_point: dict[str, Any]) -> bool:
+    """Check if the boost button must be enabled."""
+    activity: str = charge_point[ACTIVITY]
+    vehicle_status = charge_point.get(VEHICLE_STATUS)
+
+    if charge_point[SMART_CHARGING] and vehicle_status != VEHICLE_ERROR:
+        if charge_point[DELAYED_CHARGING][VALUE]:
+            return activity == DELAYED
+        if charge_point[PRICE_BASED_CHARGING][VALUE]:
+            return activity == CHARGING
+
+    return False
 
 
 CHARGE_POINT_BUTTONS = (
     ChargePointButtonEntityDescription(
         key="reset",
         translation_key="reset",
-        function=lambda client, evse_id: client.reset(evse_id),
+        function=lambda client, charge_point: client.reset(charge_point[EVSE_ID]),
         device_class=ButtonDeviceClass.RESTART,
     ),
     ChargePointButtonEntityDescription(
         key="reboot",
         translation_key="reboot",
-        function=lambda client, evse_id: client.reboot(evse_id),
+        function=lambda client, charge_point: client.reboot(charge_point[EVSE_ID]),
         device_class=ButtonDeviceClass.RESTART,
     ),
     ChargePointButtonEntityDescription(
         key="stop_charge_session",
         translation_key="stop_charge_session",
-        function=lambda client, evse_id: client.stop_session(evse_id),
+        function=lambda client, charge_point: client.stop_session(
+            charge_point[EVSE_ID]
+        ),
+    ),
+    ChargePointButtonEntityDescription(
+        key="boost",
+        translation_key="boost",
+        function=boost_charge_session,
+        is_button_available=check_boost_availability,
     ),
 )
 
@@ -86,4 +131,12 @@ class ChargePointButton(ChargepointEntity, ButtonEntity):
 
     async def async_press(self) -> None:
         """Handle the button press."""
-        await self.entity_description.function(self.connector.client, self.evse_id)
+        charge_point = self.connector.charge_points[self.evse_id]
+        await self.entity_description.function(self.connector.client, charge_point)
+
+    @callback
+    def update_from_latest_data(self) -> None:
+        """Fetch new state data for the button."""
+        if self.entity_description.is_button_available:
+            charge_point = self.connector.charge_points[self.evse_id]
+            self.has_value = self.entity_description.is_button_available(charge_point)

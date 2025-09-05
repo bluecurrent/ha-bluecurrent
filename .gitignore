@@ -27,3 +27,5 @@ scenes.yaml
 scripts.yaml
 secrets.yaml
 .idea
+
+.DS_Store

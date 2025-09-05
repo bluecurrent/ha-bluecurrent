@@ -24,6 +24,9 @@
   },
   "entity": {
     "button": {
+      "boost": {
+        "name": "Boost charge session"
+      },
       "reboot": {
         "name": "Reboot"
       },

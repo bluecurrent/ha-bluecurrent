@@ -133,6 +133,9 @@
       },
       "reset": {
         "name": "Reset"
+      },
+      "boost": {
+        "name": "Boost charge session"
       }
     },
     "switch": {

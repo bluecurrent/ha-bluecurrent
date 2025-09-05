@@ -10,7 +10,7 @@ from unittest.mock import MagicMock, patch
 from bluecurrent_api import Client
 
 from homeassistant.components.blue_current import EVSE_ID, PLUG_AND_CHARGE
-from homeassistant.components.blue_current.const import PUBLIC_CHARGING, UID
+from homeassistant.components.blue_current.const import PUBLIC_CHARGING, UID, DELAYED_CHARGING, PRICE_BASED_CHARGING
 from homeassistant.const import CONF_ID
 from homeassistant.core import HomeAssistant
 
@@ -19,6 +19,8 @@ from tests.common import MockConfigEntry
 DEFAULT_CHARGE_POINT_OPTIONS = {
     PLUG_AND_CHARGE: {"value": False, "permission": "write"},
     PUBLIC_CHARGING: {"value": True, "permission": "write"},
+    DELAYED_CHARGING: {"value": True },
+    PRICE_BASED_CHARGING: {"value": False }
 }
 
 DEFAULT_CHARGE_POINT = {

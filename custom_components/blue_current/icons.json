@@ -29,6 +29,9 @@
       },
       "stop_charge_session": {
         "default": "mdi:stop"
+      },
+      "boost": {
+        "default": "mdi:rocket-launch-outline"
       }
     },
     "switch": {
