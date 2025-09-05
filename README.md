@@ -4,7 +4,8 @@
 
 The Blue Current integration allows you to connect to your blue current account to Home Assistant and monitor your charge point(s).
 
-> [!IMPORTANT]
+> **Please note:**
+>
 > This Blue Current HACS integration may include **new, unstable experimental beta features**, which are subject to change or removal in future updates.
 >
 > For a **stable version of the Blue Current integration**, install it directly from Home Assistant (more information can be found [here](https://www.home-assistant.io/integrations/blue_current/)).
@@ -73,6 +74,8 @@ The Blue Current integration provides the following buttons:
 - Stop session
 - Reset
 - Reboot
+- Boost charge session
+  - A charge session can be boosted when smart charging is enabled.
 
 ## Actions
 The following actions are provided by the Blue Current integration:
