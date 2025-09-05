@@ -75,7 +75,7 @@ The Blue Current integration provides the following buttons:
 - Reset
 - Reboot
 - Boost charge session
-  - A charge session can be boosted when smart charging is enabled.
+  - A charge session can be boosted when smart charging is enabled. This will override the smart charging profile and will start immediately.
 
 ## Actions
 The following actions are provided by the Blue Current integration:
