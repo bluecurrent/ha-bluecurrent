@@ -26,6 +26,7 @@ from homeassistant.exceptions import (
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
+from .actions import set_user_override
 
 from .const import (
     BCU_APP,
@@ -62,6 +63,16 @@ SERVICE_START_CHARGE_SESSION_SCHEMA = vol.Schema(
     }
 )
 
+SERVICE_SET_USER_OVERRIDE_SCHEMA = vol.Schema(
+    {
+        vol.Required("device_ids"): vol.All(cv.ensure_list, [cv.string]),
+        vol.Required("current"): cv.positive_int,
+        vol.Required("override_start_time"): cv.time_period,
+        vol.Required("override_start_days"): cv.multi_select(DAYS),
+        vol.Required("override_end_time"): cv.time_period,
+        vol.Required("override_end_days"): cv.multi_select(DAYS),
+    }
+)
 
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: BlueCurrentConfigEntry
@@ -79,6 +90,17 @@ async def async_setup_entry(
         raise ConfigEntryNotReady from err
     config_entry.async_create_background_task(
         hass, connector.run_task(), "blue_current-websocket"
+    )
+
+    async def set_user_override_call(service_call: ServiceCall) -> None:
+        """Set user override."""
+        await set_user_override(hass, client, connector.charge_points, connector.schedules, service_call)
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_user_override",
+        set_user_override_call,
+        SERVICE_SET_USER_OVERRIDE_SCHEMA,
     )
 
     await client.wait_for_charge_points()
@@ -154,7 +176,8 @@ class Connector:
         self.hass = hass
         self.client = client
         self.charge_points: dict[str, dict] = {}
-        self.grid: dict[str, Any] = {}
+        self.grid: dict[str, Any] = {
+        self.schedules: dict[str, dict] = {}
         self.charge_cards: dict[str, dict[str, Any]] = {}
 
     async def on_data(self, message: dict) -> None:
@@ -178,6 +201,9 @@ class Connector:
             data: dict = message[DATA]
             self.grid = data
             self.dispatch_grid_update_signal()
+
+        elif "LIST_OVERRIDE_CURRENT" in object_name:
+            self.update_override_schedules(message[DATA])
 
     async def handle_charge_point_data(self, charge_points_data: list) -> None:
         """Handle incoming chargepoint data."""
@@ -215,6 +241,11 @@ class Connector:
         charge_point.update(data)
 
         self.dispatch_charge_point_update_signal(evse_id)
+
+    def update_override_schedules(self, schedules: list[dict]) -> None:
+        """Update the registered override schedules."""
+        for schedule in schedules:
+            self.schedules[schedule["schedule_id"]] = schedule
 
     def dispatch_charge_point_update_signal(self, evse_id: str) -> None:
         """Dispatch a charge point update signal."""

@@ -46,6 +46,7 @@ def create_client_mock(
     charge_point: dict,
     status: dict,
     grid: dict,
+    schedules: list[dict],
 ) -> MagicMock:
     """Create a mock of the bluecurrent-api Client."""
     client_mock = MagicMock(spec=Client)
@@ -72,7 +73,11 @@ def create_client_mock(
         await client_mock.receiver(
             {
                 "object": "CHARGE_POINTS",
-                "data": [charge_point],
+                "data": [charge_point, {
+                        "evse_id": "102",
+                        "model_type": "",
+                        "name": "",
+                    }],
             }
         )
         received_charge_points.set()
@@ -108,6 +113,14 @@ def create_client_mock(
             {"object": event_object, "data": {EVSE_ID: evse_id, **settings}}
         )
 
+    async def get_user_override_currents_list() -> None:
+        await client_mock.receiver(
+            {
+                "object": "LIST_OVERRIDE_CURRENT",
+                "data": schedules
+            }
+        )
+
     client_mock.connect.side_effect = connect
     client_mock.wait_for_charge_points.side_effect = wait_for_charge_points
     client_mock.get_charge_points.side_effect = get_charge_points
@@ -115,6 +128,7 @@ def create_client_mock(
     client_mock.get_grid_status.side_effect = get_grid_status
     client_mock.get_charge_cards.side_effect = get_charge_cards
     client_mock.update_charge_point = update_charge_point
+    client_mock.get_user_override_currents_list = get_user_override_currents_list
 
     return client_mock
 
@@ -126,6 +140,7 @@ async def init_integration(
     charge_point: dict | None = None,
     status: dict | None = None,
     grid: dict | None = None,
+    schedules: list[dict] | None = None,
 ) -> tuple[MagicMock, Event, FutureContainer]:
     """Set up the Blue Current integration in Home Assistant."""
 
@@ -138,11 +153,14 @@ async def init_integration(
     if grid is None:
         grid = {}
 
+    if schedules is None:
+        schedules = []
+
     future_container = FutureContainer(hass.loop.create_future())
     started_loop = Event()
 
     client_mock = create_client_mock(
-        hass, future_container, started_loop, charge_point, status, grid
+        hass, future_container, started_loop, charge_point, status, grid, schedules
     )
 
     with (
