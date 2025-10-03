@@ -94,7 +94,7 @@ async def async_setup_entry(
 
     async def set_user_override_call(service_call: ServiceCall) -> None:
         """Set user override."""
-        await set_user_override(hass, client, connector.charge_points, connector.schedules, service_call)
+        await set_user_override(hass, client, connector.schedules, service_call)
 
     hass.services.async_register(
         DOMAIN,
