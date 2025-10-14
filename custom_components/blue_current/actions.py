@@ -1,7 +1,6 @@
 """Actions for Blue Current integration."""
 
 from datetime import timedelta
-import re
 from typing import Any
 
 from bluecurrent_api import Client
@@ -30,6 +29,7 @@ from .const import (
     TUESDAY,
     WEDNESDAY,
     STOP_TIME,
+    OVERRIDE_CURRENT,
 )
 
 

@@ -39,6 +39,7 @@ from .const import (
     PLUG_AND_CHARGE,
     SERVICE_START_CHARGE_SESSION,
     VALUE,
+    DEVICE_IDS,
 )
 
 type BlueCurrentConfigEntry = ConfigEntry[Connector]
@@ -54,6 +55,8 @@ OBJECT = "object"
 VALUE_TYPES = [CHARGEPOINT_STATUS, CHARGEPOINT_SETTINGS]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
+
+DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 
 SERVICE_START_CHARGE_SESSION_SCHEMA = vol.Schema(
     {
@@ -80,6 +83,7 @@ SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
     }
 )
 
+
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: BlueCurrentConfigEntry
 ) -> bool:
@@ -104,15 +108,20 @@ async def async_setup_entry(
 
     async def clear_user_override_call(service_call: ServiceCall) -> None:
         """Clear user override."""
-        await clear_user_override(
-            hass, client, connector.schedules, service_call
-        )
+        await clear_user_override(hass, client, connector.schedules, service_call)
 
     hass.services.async_register(
         DOMAIN,
         "set_user_override",
         set_user_override_call,
         SERVICE_SET_USER_OVERRIDE_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "clear_user_override",
+        clear_user_override_call,
+        SERVICE_CLEAR_USER_OVERRIDE_SCHEMA,
     )
 
     await client.wait_for_charge_points()
@@ -188,7 +197,7 @@ class Connector:
         self.hass = hass
         self.client = client
         self.charge_points: dict[str, dict] = {}
-        self.grid: dict[str, Any] = {
+        self.grid: dict[str, Any] = {}
         self.schedules: dict[str, dict] = {}
         self.charge_cards: dict[str, dict[str, Any]] = {}
 
