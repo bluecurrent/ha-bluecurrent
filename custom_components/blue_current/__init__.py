@@ -26,7 +26,7 @@ from homeassistant.exceptions import (
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
-from .actions import set_user_override
+from .actions import set_user_override, clear_user_override
 
 from .const import (
     BCU_APP,
@@ -74,6 +74,12 @@ SERVICE_SET_USER_OVERRIDE_SCHEMA = vol.Schema(
     }
 )
 
+SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
+    {
+        vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
+    }
+)
+
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: BlueCurrentConfigEntry
 ) -> bool:
@@ -95,6 +101,12 @@ async def async_setup_entry(
     async def set_user_override_call(service_call: ServiceCall) -> None:
         """Set user override."""
         await set_user_override(hass, client, connector.schedules, service_call)
+
+    async def clear_user_override_call(service_call: ServiceCall) -> None:
+        """Clear user override."""
+        await clear_user_override(
+            hass, client, connector.schedules, service_call
+        )
 
     hass.services.async_register(
         DOMAIN,

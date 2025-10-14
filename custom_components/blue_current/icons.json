@@ -49,6 +49,9 @@
   "services": {
     "start_charge_session": {
       "service": "mdi:play"
+    },
+    "clear_user_override": {
+      "service": "mdi:close-thick"
     }
   }
 }
