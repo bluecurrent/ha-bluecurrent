@@ -166,6 +166,16 @@
     }
   },
   "services": {
+    "clear_user_override": {
+      "description": "Clear the override current on charge points.",
+      "fields": {
+        "device_ids": {
+          "description": "The ID's of the Blue Current charge point.",
+          "name": "Device ID's"
+        }
+      },
+      "name": "Clear the user override current"
+    },
     "start_charge_session": {
       "description": "Starts a new charge session on a specified charge point.",
       "fields": {

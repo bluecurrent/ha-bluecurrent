@@ -40,6 +40,11 @@ from .const import (
     SERVICE_START_CHARGE_SESSION,
     VALUE,
     DEVICE_IDS,
+    CURRENT,
+    OVERRIDE_START_TIME,
+    OVERRIDE_START_DAYS,
+    OVERRIDE_END_TIME,
+    OVERRIDE_END_DAYS,
 )
 
 type BlueCurrentConfigEntry = ConfigEntry[Connector]
@@ -68,12 +73,12 @@ SERVICE_START_CHARGE_SESSION_SCHEMA = vol.Schema(
 
 SERVICE_SET_USER_OVERRIDE_SCHEMA = vol.Schema(
     {
-        vol.Required("device_ids"): vol.All(cv.ensure_list, [cv.string]),
-        vol.Required("current"): cv.positive_int,
-        vol.Required("override_start_time"): cv.time_period,
-        vol.Required("override_start_days"): cv.multi_select(DAYS),
-        vol.Required("override_end_time"): cv.time_period,
-        vol.Required("override_end_days"): cv.multi_select(DAYS),
+        vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
+        vol.Required(CURRENT): cv.positive_int,
+        vol.Required(OVERRIDE_START_TIME): cv.time_period,
+        vol.Required(OVERRIDE_START_DAYS): cv.multi_select(DAYS),
+        vol.Required(OVERRIDE_END_TIME): cv.time_period,
+        vol.Required(OVERRIDE_END_DAYS): cv.multi_select(DAYS),
     }
 )
 
@@ -125,6 +130,8 @@ async def async_setup_entry(
     )
 
     await client.wait_for_charge_points()
+    await client.get_user_override_currents_list()
+
     config_entry.runtime_data = connector
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
@@ -226,6 +233,9 @@ class Connector:
         elif "LIST_OVERRIDE_CURRENT" in object_name:
             self.update_override_schedules(message[DATA])
 
+        elif object_name in ("POST_EDIT_OVERRIDE_CURRENT", "POST_SET_OVERRIDE_CURRENT"):
+            self.update_schedule(message[DATA])
+
     async def handle_charge_point_data(self, charge_points_data: list) -> None:
         """Handle incoming chargepoint data."""
         await asyncio.gather(
@@ -266,7 +276,11 @@ class Connector:
     def update_override_schedules(self, schedules: list[dict]) -> None:
         """Update the registered override schedules."""
         for schedule in schedules:
-            self.schedules[schedule["schedule_id"]] = schedule
+            self.update_schedule(schedule)
+
+    def update_schedule(self, schedule: dict) -> None:
+        """Add or register an existing schedule."""
+        self.schedules[schedule["schedule_id"]] = schedule
 
     def dispatch_charge_point_update_signal(self, evse_id: str) -> None:
         """Dispatch a charge point update signal."""

@@ -10,7 +10,12 @@ from unittest.mock import MagicMock, patch
 from bluecurrent_api import Client
 
 from homeassistant.components.blue_current import EVSE_ID, PLUG_AND_CHARGE
-from homeassistant.components.blue_current.const import PUBLIC_CHARGING, UID, DELAYED_CHARGING, PRICE_BASED_CHARGING
+from homeassistant.components.blue_current.const import (
+    PUBLIC_CHARGING,
+    UID,
+    DELAYED_CHARGING,
+    PRICE_BASED_CHARGING,
+)
 from homeassistant.const import CONF_ID
 from homeassistant.core import HomeAssistant
 
@@ -19,8 +24,8 @@ from tests.common import MockConfigEntry
 DEFAULT_CHARGE_POINT_OPTIONS = {
     PLUG_AND_CHARGE: {"value": False, "permission": "write"},
     PUBLIC_CHARGING: {"value": True, "permission": "write"},
-    DELAYED_CHARGING: {"value": True },
-    PRICE_BASED_CHARGING: {"value": False }
+    DELAYED_CHARGING: {"value": True},
+    PRICE_BASED_CHARGING: {"value": False},
 }
 
 DEFAULT_CHARGE_POINT = {
@@ -43,7 +48,7 @@ def create_client_mock(
     hass: HomeAssistant,
     future_container: FutureContainer,
     started_loop: Event,
-    charge_point: dict,
+    charge_points: list[dict],
     status: dict,
     grid: dict,
     schedules: list[dict],
@@ -73,11 +78,7 @@ def create_client_mock(
         await client_mock.receiver(
             {
                 "object": "CHARGE_POINTS",
-                "data": [charge_point, {
-                        "evse_id": "102",
-                        "model_type": "",
-                        "name": "",
-                    }],
+                "data": charge_points,
             }
         )
         received_charge_points.set()
@@ -115,10 +116,7 @@ def create_client_mock(
 
     async def get_user_override_currents_list() -> None:
         await client_mock.receiver(
-            {
-                "object": "LIST_OVERRIDE_CURRENT",
-                "data": schedules
-            }
+            {"object": "LIST_OVERRIDE_CURRENT", "data": schedules}
         )
 
     client_mock.connect.side_effect = connect
@@ -137,15 +135,15 @@ async def init_integration(
     hass: HomeAssistant,
     config_entry: MockConfigEntry,
     platform="",
-    charge_point: dict | None = None,
+    charge_points: list[dict] | None = None,
     status: dict | None = None,
     grid: dict | None = None,
     schedules: list[dict] | None = None,
 ) -> tuple[MagicMock, Event, FutureContainer]:
     """Set up the Blue Current integration in Home Assistant."""
 
-    if charge_point is None:
-        charge_point = DEFAULT_CHARGE_POINT
+    if charge_points is None:
+        charge_points = [DEFAULT_CHARGE_POINT]
 
     if status is None:
         status = {}
@@ -160,7 +158,7 @@ async def init_integration(
     started_loop = Event()
 
     client_mock = create_client_mock(
-        hass, future_container, started_loop, charge_point, status, grid, schedules
+        hass, future_container, started_loop, charge_points, status, grid, schedules
     )
 
     with (
