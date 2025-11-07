@@ -1,5 +1,7 @@
 """The tests for Bluecurrent switches."""
 
+from typing import Any
+
 from homeassistant.components.blue_current import CHARGEPOINT_SETTINGS, PLUG_AND_CHARGE
 from homeassistant.components.blue_current.const import (
     ACTIVITY,
@@ -12,7 +14,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_registry import EntityRegistry
 
-from . import DEFAULT_CHARGE_POINT, init_integration
+from . import init_integration
 
 from tests.common import MockConfigEntry
 
@@ -37,13 +39,17 @@ async def test_switches(
 
 
 async def test_switches_offline(
-    hass: HomeAssistant, config_entry: MockConfigEntry, entity_registry: EntityRegistry
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    entity_registry: EntityRegistry,
+    charge_point: dict[str, Any],
 ) -> None:
     """Test if switches are disabled when needed."""
-    charge_point = DEFAULT_CHARGE_POINT.copy()
     charge_point[ACTIVITY] = "offline"
 
-    await init_integration(hass, config_entry, Platform.SWITCH, charge_point)
+    await init_integration(
+        hass, config_entry, Platform.SWITCH, charge_points=[charge_point]
+    )
 
     entity_entries = er.async_entries_for_config_entry(
         entity_registry, config_entry.entry_id
@@ -58,13 +64,17 @@ async def test_switches_offline(
 
 
 async def test_block_switch_availability(
-    hass: HomeAssistant, config_entry: MockConfigEntry, entity_registry: EntityRegistry
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    entity_registry: EntityRegistry,
+    charge_point: dict[str, Any],
 ) -> None:
     """Test if the block switch is unavailable when charging."""
-    charge_point = DEFAULT_CHARGE_POINT.copy()
     charge_point[ACTIVITY] = "charging"
 
-    await init_integration(hass, config_entry, Platform.SWITCH, charge_point)
+    await init_integration(
+        hass, config_entry, Platform.SWITCH, charge_points=[charge_point]
+    )
 
     state = hass.states.get("switch.101_block_charge_point")
     assert state and state.state == UNAVAILABLE

@@ -26,6 +26,7 @@ from homeassistant.exceptions import (
 from homeassistant.helpers import config_validation as cv, device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
+from .actions import set_user_override, clear_user_override
 
 from .const import (
     BCU_APP,
@@ -38,6 +39,12 @@ from .const import (
     PLUG_AND_CHARGE,
     SERVICE_START_CHARGE_SESSION,
     VALUE,
+    DEVICE_IDS,
+    CURRENT,
+    OVERRIDE_START_TIME,
+    OVERRIDE_START_DAYS,
+    OVERRIDE_END_TIME,
+    OVERRIDE_END_DAYS,
 )
 
 type BlueCurrentConfigEntry = ConfigEntry[Connector]
@@ -54,11 +61,30 @@ VALUE_TYPES = [CHARGEPOINT_STATUS, CHARGEPOINT_SETTINGS]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
+DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+
 SERVICE_START_CHARGE_SESSION_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_DEVICE_ID): cv.string,
         # When no charging card is provided, use no charging card (BCU_APP = no charging card).
         vol.Optional(CHARGING_CARD_ID, default=BCU_APP): cv.string,
+    }
+)
+
+SERVICE_SET_USER_OVERRIDE_SCHEMA = vol.Schema(
+    {
+        vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
+        vol.Required(CURRENT): cv.positive_int,
+        vol.Required(OVERRIDE_START_TIME): cv.time_period,
+        vol.Required(OVERRIDE_START_DAYS): cv.multi_select(DAYS),
+        vol.Required(OVERRIDE_END_TIME): cv.time_period,
+        vol.Required(OVERRIDE_END_DAYS): cv.multi_select(DAYS),
+    }
+)
+
+SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
+    {
+        vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
     }
 )
 
@@ -81,7 +107,31 @@ async def async_setup_entry(
         hass, connector.run_task(), "blue_current-websocket"
     )
 
+    async def set_user_override_call(service_call: ServiceCall) -> None:
+        """Set user override."""
+        await set_user_override(hass, client, connector.schedules, service_call)
+
+    async def clear_user_override_call(service_call: ServiceCall) -> None:
+        """Clear user override."""
+        await clear_user_override(hass, client, connector.schedules, service_call)
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_user_override",
+        set_user_override_call,
+        SERVICE_SET_USER_OVERRIDE_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "clear_user_override",
+        clear_user_override_call,
+        SERVICE_CLEAR_USER_OVERRIDE_SCHEMA,
+    )
+
     await client.wait_for_charge_points()
+    await client.get_user_override_currents_list()
+
     config_entry.runtime_data = connector
     await hass.config_entries.async_forward_entry_setups(config_entry, PLATFORMS)
 
@@ -155,6 +205,7 @@ class Connector:
         self.client = client
         self.charge_points: dict[str, dict] = {}
         self.grid: dict[str, Any] = {}
+        self.schedules: dict[str, dict] = {}
         self.charge_cards: dict[str, dict[str, Any]] = {}
 
     async def on_data(self, message: dict) -> None:
@@ -178,6 +229,12 @@ class Connector:
             data: dict = message[DATA]
             self.grid = data
             self.dispatch_grid_update_signal()
+
+        elif "LIST_OVERRIDE_CURRENT" in object_name:
+            self.update_override_schedules(message[DATA])
+
+        elif object_name in ("POST_EDIT_OVERRIDE_CURRENT", "POST_SET_OVERRIDE_CURRENT"):
+            self.update_schedule(message[DATA])
 
     async def handle_charge_point_data(self, charge_points_data: list) -> None:
         """Handle incoming chargepoint data."""
@@ -215,6 +272,15 @@ class Connector:
         charge_point.update(data)
 
         self.dispatch_charge_point_update_signal(evse_id)
+
+    def update_override_schedules(self, schedules: list[dict]) -> None:
+        """Update the registered override schedules."""
+        for schedule in schedules:
+            self.update_schedule(schedule)
+
+    def update_schedule(self, schedule: dict) -> None:
+        """Add or register an existing schedule."""
+        self.schedules[schedule["schedule_id"]] = schedule
 
     def dispatch_charge_point_update_signal(self, evse_id: str) -> None:
         """Dispatch a charge point update signal."""

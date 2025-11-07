@@ -10,3 +10,65 @@ start_charge_session:
       selector:
         text:
       required: false
+
+set_user_override:
+  fields:
+    device_ids:
+      selector:
+        device:
+          integration: blue_current
+          multiple: true
+      required: true
+    current:
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: A
+          mode: box
+      required: true
+    override_start_days:
+      selector:
+        select:
+          translation_key: days
+          options:
+            - monday
+            - tuesday
+            - wednesday
+            - thursday
+            - friday
+            - saturday
+            - sunday
+          multiple: true
+      required: true
+    override_start_time:
+      selector:
+        time:
+      required: true
+    override_end_days:
+      selector:
+        select:
+          translation_key: days
+          options:
+            - monday
+            - tuesday
+            - wednesday
+            - thursday
+            - friday
+            - saturday
+            - sunday
+          multiple: true
+      required: true
+    override_end_time:
+      selector:
+        time:
+      required: true
+
+clear_user_override:
+  fields:
+    device_ids:
+      selector:
+        device:
+          integration: blue_current
+          multiple: true
+      required: true
