@@ -6,6 +6,7 @@ import asyncio
 from contextlib import suppress
 from typing import Any
 
+import voluptuous as vol
 from bluecurrent_api import Client
 from bluecurrent_api.exceptions import (
     BlueCurrentException,
@@ -13,8 +14,6 @@ from bluecurrent_api.exceptions import (
     RequestLimitReached,
     WebsocketError,
 )
-import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import CONF_API_TOKEN, CONF_DEVICE_ID, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -23,28 +22,29 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
     ServiceValidationError,
 )
-from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
-from .actions import set_user_override, clear_user_override
 
+from .actions import clear_user_override, set_delayed_charging, set_user_override
 from .const import (
     BCU_APP,
     CHARGEPOINT_SETTINGS,
     CHARGEPOINT_STATUS,
     CHARGING_CARD_ID,
+    CURRENT,
+    DEVICE_IDS,
     DOMAIN,
     EVSE_ID,
     LOGGER,
+    OVERRIDE_END_DAYS,
+    OVERRIDE_END_TIME,
+    OVERRIDE_START_DAYS,
+    OVERRIDE_START_TIME,
     PLUG_AND_CHARGE,
     SERVICE_START_CHARGE_SESSION,
     VALUE,
-    DEVICE_IDS,
-    CURRENT,
-    OVERRIDE_START_TIME,
-    OVERRIDE_START_DAYS,
-    OVERRIDE_END_TIME,
-    OVERRIDE_END_DAYS,
 )
 
 type BlueCurrentConfigEntry = ConfigEntry[Connector]
@@ -88,6 +88,15 @@ SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
     }
 )
 
+SERVICE_DELAYED_CHARGING_SCHEMA = vol.Schema(
+    {
+        vol.Required("device_id"): cv.string,
+        vol.Required("days"): cv.multi_select(DAYS),
+        vol.Required("end_time"): cv.time_period,
+        vol.Required("start_time"): cv.time_period,
+    }
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: BlueCurrentConfigEntry
@@ -106,6 +115,10 @@ async def async_setup_entry(
     config_entry.async_create_background_task(
         hass, connector.run_task(), "blue_current-websocket"
     )
+
+    async def set_delayed_charging_call(service_call: ServiceCall) -> None:
+        """Set price based charging."""
+        await set_delayed_charging(hass, client, connector.charge_points, service_call)
 
     async def set_user_override_call(service_call: ServiceCall) -> None:
         """Set user override."""
@@ -127,6 +140,13 @@ async def async_setup_entry(
         "clear_user_override",
         clear_user_override_call,
         SERVICE_CLEAR_USER_OVERRIDE_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_delayed_charging",
+        set_delayed_charging_call,
+        SERVICE_DELAYED_CHARGING_SCHEMA,
     )
 
     await client.wait_for_charge_points()
@@ -155,16 +175,29 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                 translation_domain=DOMAIN, translation_key="invalid_device_id"
             )
 
-        config_entry = hass.config_entries.async_get_entry(
-            list(device.config_entries)[0]
-        )
+        blue_current_config_entry: ConfigEntry | None = None
 
-        if config_entry is None or config_entry.state is not ConfigEntryState.LOADED:
+        for config_entry_id in device.config_entries:
+            config_entry = hass.config_entries.async_get_entry(config_entry_id)
+            if not config_entry or config_entry.domain != DOMAIN:
+                # Not the blue_current config entry.
+                continue
+
+            if config_entry.state is not ConfigEntryState.LOADED:
+                raise ServiceValidationError(
+                    translation_domain=DOMAIN, translation_key="config_entry_not_loaded"
+                )
+
+            blue_current_config_entry = config_entry
+            break
+
+        if not blue_current_config_entry:
+            # The device is not connected to a valid blue_current config entry.
             raise ServiceValidationError(
-                translation_domain=DOMAIN, translation_key="config_entry_not_loaded"
+                translation_domain=DOMAIN, translation_key="no_config_entry"
             )
 
-        connector = config_entry.runtime_data
+        connector = blue_current_config_entry.runtime_data
 
         # Get the evse_id from the identifier of the device.
         evse_id = next(

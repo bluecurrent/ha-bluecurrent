@@ -3,27 +3,29 @@
 from typing import Any
 
 import pytest
-from syrupy.assertion import SnapshotAssertion
-
 from homeassistant.components.blue_current.const import (
+    ACTIVITY,
+    CHARGING,
+    DELAYED,
     DELAYED_CHARGING,
     PRICE_BASED_CHARGING,
     SMART_CHARGING,
     VALUE,
-    ACTIVITY,
-    DELAYED,
-    CHARGING,
 )
-from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN, SERVICE_PRESS
+from homeassistant.components.button import DOMAIN as BUTTON_DOMAIN
+from homeassistant.components.button import SERVICE_PRESS
 from homeassistant.const import (
     ATTR_ENTITY_ID,
+    STATE_UNAVAILABLE,
     STATE_UNKNOWN,
     Platform,
-    STATE_UNAVAILABLE,
 )
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from syrupy.assertion import SnapshotAssertion
+
 from tests.common import MockConfigEntry, snapshot_platform
+
 from . import init_integration
 
 charge_point_buttons = [
@@ -41,7 +43,7 @@ async def test_buttons_created(
     entity_registry: er.EntityRegistry,
     charge_point: dict[str, Any],
 ) -> None:
-    """Test if all butons are created."""
+    """Test if all buttons are created."""
     charge_point[SMART_CHARGING] = True
 
     await init_integration(

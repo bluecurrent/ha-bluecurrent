@@ -146,6 +146,12 @@
     },
     "invalid_device_id": {
       "message": "Invalid device ID given."
+    },
+    "no_config_entry": {
+      "message": "Device has not a valid blue_current config entry."
+    },
+    "smart_charging_not_supported": {
+      "message": "Cannot use smart charging on this charge point."
     }
   },
   "options": {
@@ -186,6 +192,28 @@
         }
       },
       "name": "Clear the user override current"
+    },
+    "set_delayed_charging": {
+      "description": "Change the current smart charging profile to Delayed Charging.",
+      "fields": {
+        "days": {
+          "description": "",
+          "name": "Days that price based charging is activated."
+        },
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "end_time": {
+          "description": "Time when the delay starts.",
+          "name": "Delay from"
+        },
+        "start_time": {
+          "description": "Time when the delay ends.",
+          "name": "Delay to"
+        }
+      },
+      "name": "Set Delayed Charging profile"
     },
     "set_user_override": {
       "description": "Set the maximum current that can be used while Smart Charging.",

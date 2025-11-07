@@ -72,3 +72,33 @@ clear_user_override:
           integration: blue_current
           multiple: true
       required: true
+
+set_delayed_charging:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    days:
+      selector:
+        select:
+          translation_key: days
+          options:
+            - monday
+            - tuesday
+            - wednesday
+            - thursday
+            - friday
+            - saturday
+            - sunday
+          multiple: true
+      required: true
+    end_time:
+      selector:
+        time:
+      required: true
+    start_time:
+      selector:
+        time:
+      required: true

@@ -1,14 +1,16 @@
 """tests for Blue Current actions."""
 
+from typing import Any
 from unittest.mock import call
 
 from bluecurrent_api.types import OverrideCurrentPayload
-
 from homeassistant.components.blue_current import DOMAIN
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import device_registry as dr
+
 from tests.common import MockConfigEntry
+
 from . import DEFAULT_CHARGE_POINT, init_integration
 
 SECOND_CHARGE_POINT = {
@@ -16,6 +18,88 @@ SECOND_CHARGE_POINT = {
     "model_type": "",
     "name": "",
 }
+
+
+async def test_set_delayed_charging_action(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    delayed_charging_charge_point: dict[str, Any],
+) -> None:
+    """Test the set delayed charging action."""
+
+    integration = await init_integration(
+        hass, config_entry, Platform.BUTTON, [delayed_charging_charge_point]
+    )
+    client = integration[0]
+
+    await hass.services.async_call(
+        DOMAIN,
+        "set_delayed_charging",
+        {
+            "device_id": list(dr.async_get(hass).devices)[0],
+            "end_time": "10:00:00",
+            "start_time": "20:00:00",
+            "days": ["monday", "thursday"],
+        },
+        blocking=True,
+    )
+    # 1: monday, 4: thursday
+    client.set_delayed_charging_settings.assert_called_once_with(
+        "101", [1, 4], "20:00", "10:00"
+    )
+
+
+async def test_switch_profile_action_with_no_selected_profile(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    smart_charging_no_profile_charge_point: dict[str, Any],
+) -> None:
+    """Test the switch profile action when no other profile has been selected."""
+    integration = await init_integration(
+        hass, config_entry, Platform.BUTTON, [smart_charging_no_profile_charge_point]
+    )
+    client = integration[0]
+
+    await hass.services.async_call(
+        DOMAIN,
+        "set_delayed_charging",
+        {
+            "device_id": list(dr.async_get(hass).devices)[0],
+            "end_time": "10:00:00",
+            "start_time": "20:00:00",
+            "days": ["monday", "thursday"],
+        },
+        blocking=True,
+    )
+
+    client.set_delayed_charging.assert_called_once_with("101", True)
+
+
+async def test_switch_profile_action_with_previous_selected_profile(
+    hass: HomeAssistant,
+    config_entry: MockConfigEntry,
+    price_based_charging_charge_point,
+) -> None:
+    """Test the switch profile action when another profile has been selected already."""
+    integration = await init_integration(
+        hass, config_entry, Platform.BUTTON, [price_based_charging_charge_point]
+    )
+    client = integration[0]
+
+    await hass.services.async_call(
+        DOMAIN,
+        "set_delayed_charging",
+        {
+            "device_id": list(dr.async_get(hass).devices)[0],
+            "end_time": "10:00:00",
+            "start_time": "20:00:00",
+            "days": ["monday", "thursday"],
+        },
+        blocking=True,
+    )
+
+    client.set_price_based_charging.assert_called_once_with("101", False)
+    client.set_delayed_charging.assert_called_once_with("101", True)
 
 
 async def test_user_override_with_new_schedule(
