@@ -127,17 +127,6 @@
           "vehicle_error": "Error"
         }
       }
-    },
-    "switch": {
-      "block": {
-        "name": "Block charge point"
-      },
-      "linked_charge_cards_only": {
-        "name": "Linked charging cards only"
-      },
-      "plug_and_charge": {
-        "name": "Plug & Charge"
-      }
     }
   },
   "exceptions": {
@@ -148,20 +137,16 @@
       "message": "Invalid device ID given."
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "data": {
-          "card": "Card"
-        },
-        "description": "Select the default charging card you want to use"
-      }
-    }
-  },
   "selector": {
-    "select_charging_card": {
+    "days": {
       "options": {
-        "without_charging_card": "Without charging card"
+        "friday": "Friday",
+        "monday": "Monday",
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+        "thursday": "Thursday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday"
       }
     }
   },
@@ -176,19 +161,35 @@
       },
       "name": "Clear the user override current"
     },
-    "start_charge_session": {
-      "description": "Starts a new charge session on a specified charge point.",
+    "set_user_override": {
+      "description": "Set the maximum current that can be used while Smart Charging.",
       "fields": {
-        "charging_card_id": {
-          "description": "Optional charging card ID that will be used to start a charge session. When not provided, no charging card will be used.",
-          "name": "Charging card ID"
+        "current": {
+          "description": "If the current that Smart Charging would advise is higher thant the user override, it will advise the user override instead.",
+          "name": "Current"
         },
-        "device_id": {
-          "description": "The ID of the Blue Current charge point.",
-          "name": "Device ID"
+        "device_ids": {
+          "description": "The ID's of the Blue Current charge point.",
+          "name": "Device ID's"
+        },
+        "override_end_days": {
+          "description": "The days the override will end.",
+          "name": "End days"
+        },
+        "override_end_time": {
+          "description": "The time the override will end.",
+          "name": "End time"
+        },
+        "override_start_days": {
+          "description": "The days the override will start.",
+          "name": "Start days"
+        },
+        "override_start_time": {
+          "description": "The time the override will start.",
+          "name": "Start time"
         }
       },
-      "name": "Start charge session"
+      "name": "Set the user override current"
     }
   }
 }

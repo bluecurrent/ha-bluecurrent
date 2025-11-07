@@ -22,16 +22,6 @@
       "wrong_account": "Wrong account: Please authenticate with the API token for {email}."
     }
   },
-  "options": {
-    "step": {
-      "init": {
-        "data": {
-          "card": "Card"
-        },
-        "description": "Select the default charging card you want to use"
-      }
-    }
-  },
   "entity": {
     "sensor": {
       "activity": {
@@ -137,38 +127,36 @@
       "boost": {
         "name": "Boost charge session"
       }
-    },
-    "switch": {
-      "plug_and_charge": {
-        "name": "Plug & Charge"
-      },
-      "linked_charge_cards_only": {
-        "name": "Linked charging cards only"
-      },
-      "block": {
-        "name": "Block charge point"
-      }
-    }
-  },
-  "selector": {
-    "select_charging_card": {
-      "options": {
-        "without_charging_card": "Without charging card"
-      }
     }
   },
   "services": {
-    "start_charge_session": {
-      "name": "Start charge session",
-      "description": "Starts a new charge session on a specified charge point.",
+    "set_user_override": {
+      "name": "Set the user override current",
+      "description": "Set the maximum current that can be used while Smart Charging.",
       "fields": {
-        "charging_card_id": {
-          "name": "Charging card ID",
-          "description": "Optional charging card ID that will be used to start a charge session. When not provided, no charging card will be used."
+        "device_ids": {
+          "name": "Device ID's",
+          "description": "The ID's of the Blue Current charge point."
         },
-        "device_id": {
-          "name": "Device ID",
-          "description": "The ID of the Blue Current charge point."
+        "current": {
+          "name": "Current",
+          "description": "If the current that Smart Charging would advise is higher thant the user override, it will advise the user override instead."
+        },
+        "override_start_days": {
+          "name": "Start days",
+          "description": "The days the override will start."
+        },
+        "override_start_time": {
+          "name": "Start time",
+          "description": "The time the override will start."
+        },
+        "override_end_days": {
+          "name": "End days",
+          "description": "The days the override will end."
+        },
+        "override_end_time": {
+          "name": "End time",
+          "description": "The time the override will end."
         }
       }
     },
@@ -180,6 +168,19 @@
           "name": "Device ID's",
           "description": "The ID's of the Blue Current charge point."
         }
+      }
+    }
+  },
+  "selector": {
+    "days": {
+      "options": {
+        "monday": "[%key:common::time::monday%]",
+        "tuesday": "[%key:common::time::tuesday%]",
+        "wednesday": "[%key:common::time::wednesday%]",
+        "thursday": "[%key:common::time::thursday%]",
+        "friday": "[%key:common::time::friday%]",
+        "saturday": "[%key:common::time::saturday%]",
+        "sunday": "[%key:common::time::sunday%]"
       }
     }
   },
