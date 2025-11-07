@@ -147,11 +147,11 @@
     "invalid_device_id": {
       "message": "Invalid device ID given."
     },
-    "smart_charging_not_supported": {
-      "message": "Cannot use smart charging on this charge point."
-    },
     "no_config_entry": {
       "message": "Device has not a valid blue_current config entry."
+    },
+    "smart_charging_not_supported": {
+      "message": "Cannot use smart charging on this charge point."
     }
   },
   "options": {
