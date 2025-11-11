@@ -235,6 +235,83 @@ async def set_delayed_charging(
     )
 
 
+async def set_price_based_charging(
+    hass: HomeAssistant,
+    client: Client,
+    charge_points: dict[str, dict],
+    service_call: ServiceCall,
+) -> None:
+    """Set smart charging profile."""
+    device_id = service_call.data["device_id"]
+
+    battery_size_kwh = service_call.data["battery_size_kwh"]
+    minimum_pct = service_call.data["minimum_pct"]
+
+    device = dr.async_get(hass).devices[device_id]
+    evse_id = next(
+        identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
+    )
+
+    profile = get_current_smart_charging_profile(charge_points[evse_id])
+
+    print("SET PRICE BASED CHARGING")
+    print(device_id)
+    print(evse_id)
+    print(profile)
+    print(battery_size_kwh)
+    print(minimum_pct)
+
+    # await switch_profile_if_needed(
+    #     evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
+    # )
+    #
+    # await client.set_price_based_settings(
+    #     evse_id,
+    #     expected_departure_time,
+    #     expected_charging_session_size,
+    #     immediately_charge,
+    # )
+
+
+async def update_price_based_charging(
+    hass: HomeAssistant,
+    client: Client,
+    charge_points: dict[str, dict],
+    service_call: ServiceCall,
+) -> None:
+    """Set smart charging profile."""
+    device_id = service_call.data["device_id"]
+
+    expected_departure_time_data = service_call.data["expected_departure_time"]
+    expected_departure_time = timedelta_to_str(expected_departure_time_data)
+
+    current_battery_percentage = service_call.data["expected_departure_time"]
+
+    device = dr.async_get(hass).devices[device_id]
+
+    evse_id = next(
+        identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
+    )
+
+    profile = get_current_smart_charging_profile(charge_points[evse_id])
+
+    print("UPDATE PRICE BASED CHARGING")
+    print(device_id)
+    print(expected_departure_time)
+    print(current_battery_percentage)
+
+    # await switch_profile_if_needed(
+    #     evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
+    # )
+    #
+    # await client.set_price_based_settings(
+    #     evse_id,
+    #     expected_departure_time,
+    #     expected_charging_session_size,
+    #     immediately_charge,
+    # )
+
+
 async def switch_profile_if_needed(
     evse_id: str,
     client: Client,

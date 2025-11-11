@@ -27,7 +27,13 @@ from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
 
-from .actions import clear_user_override, set_delayed_charging, set_user_override
+from .actions import (
+    clear_user_override,
+    set_delayed_charging,
+    set_price_based_charging,
+    set_user_override,
+    update_price_based_charging,
+)
 from .const import (
     BCU_APP,
     CHARGEPOINT_SETTINGS,
@@ -88,6 +94,22 @@ SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
     }
 )
 
+SERVICE_SET_PRICE_BASED_CHARGING_SCHEMA = vol.Schema(
+    {
+        vol.Required("device_id"): cv.string,
+        vol.Required("battery_size"): vol.Range(1),
+        vol.Required("minimum_percentage"): vol.Range(1, 100),
+    }
+)
+
+SERVICE_UPDATE_PRICE_BASED_CHARGING_SCHEMA = vol.Schema(
+    {
+        vol.Required("device_id"): cv.string,
+        vol.Required("expected_departure_time"): cv.time_period,
+        vol.Required("current_percentage"): vol.Range(1, 100),
+    }
+)
+
 SERVICE_DELAYED_CHARGING_SCHEMA = vol.Schema(
     {
         vol.Required("device_id"): cv.string,
@@ -116,6 +138,18 @@ async def async_setup_entry(
         hass, connector.run_task(), "blue_current-websocket"
     )
 
+    async def set_price_based_charging_call(service_call: ServiceCall) -> None:
+        """Set smart charging profile."""
+        await set_price_based_charging(
+            hass, client, connector.charge_points, service_call
+        )
+
+    async def update_price_based_charging_call(service_call: ServiceCall) -> None:
+        """Update smart charging profile."""
+        await update_price_based_charging(
+            hass, client, connector.charge_points, service_call
+        )
+
     async def set_delayed_charging_call(service_call: ServiceCall) -> None:
         """Set price based charging."""
         await set_delayed_charging(hass, client, connector.charge_points, service_call)
@@ -140,6 +174,20 @@ async def async_setup_entry(
         "clear_user_override",
         clear_user_override_call,
         SERVICE_CLEAR_USER_OVERRIDE_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_price_based_charging",
+        set_price_based_charging_call,
+        SERVICE_SET_PRICE_BASED_CHARGING_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "update_price_based_charging",
+        update_price_based_charging_call,
+        SERVICE_UPDATE_PRICE_BASED_CHARGING_SCHEMA,
     )
 
     hass.services.async_register(
@@ -245,6 +293,8 @@ class Connector:
         """Handle received data."""
 
         object_name: str = message[OBJECT]
+
+        print(message)
 
         # gets charge point ids
         if object_name == CHARGE_POINTS:

@@ -53,6 +53,9 @@
     "set_delayed_charging": {
       "service": "mdi:clock-outline"
     },
+    "set_price_based_charging": {
+      "service": "mdi:cash-multiple"
+    },
     "start_charge_session": {
       "service": "mdi:play"
     },

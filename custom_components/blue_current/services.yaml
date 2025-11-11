@@ -102,3 +102,46 @@ set_delayed_charging:
       selector:
         time:
       required: true
+
+set_price_based_charging:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    battery_size:
+      selector:
+        number:
+          min: 1
+          unit_of_measurement: kWh
+          mode: box
+      required: true
+    minimum_percentage:
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: box
+      required: true
+
+update_price_based_charging:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    expected_departure_time:
+      selector:
+        time:
+      required: true
+    current_percentage:
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: box
+      required: true

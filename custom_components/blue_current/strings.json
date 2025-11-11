@@ -215,6 +215,28 @@
       },
       "name": "Set Delayed Charging profile"
     },
+    "set_price_based_charging": {
+      "name": "Set Price-Based Charging profile",
+      "description": "Change the current smart charging profile to Price-Based Charging.",
+      "fields": {
+        "device_id": {
+          "name": "Device ID",
+          "description": "The ID of the Blue Current charge point."
+        },
+        "expected_departure_time": {
+          "name": "Expected departure time.",
+          "description": ""
+        },
+        "expected_charging_session_size": {
+          "name": "Expected charging session size.",
+          "description": ""
+        },
+        "immediately_charge": {
+          "name": "Immediately charge",
+          "description": "The ID of the Blue Current charge point."
+        }
+      }
+    },
     "set_user_override": {
       "description": "Set the maximum current that can be used while Smart Charging.",
       "fields": {
