@@ -159,6 +159,17 @@
     }
   },
   "selector": {
+    "days": {
+      "options": {
+        "friday": "Friday",
+        "monday": "Monday",
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+        "thursday": "Thursday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday"
+      }
+    },
     "select_charging_card": {
       "options": {
         "without_charging_card": "Without charging card"
@@ -175,6 +186,36 @@
         }
       },
       "name": "Clear the user override current"
+    },
+    "set_user_override": {
+      "description": "Set the maximum current that can be used while Smart Charging.",
+      "fields": {
+        "current": {
+          "description": "If the current that Smart Charging would advise is higher thant the user override, it will advise the user override instead.",
+          "name": "Current"
+        },
+        "device_ids": {
+          "description": "The ID's of the Blue Current charge point.",
+          "name": "Device ID's"
+        },
+        "override_end_days": {
+          "description": "The days the override will end.",
+          "name": "End days"
+        },
+        "override_end_time": {
+          "description": "The time the override will end.",
+          "name": "End time"
+        },
+        "override_start_days": {
+          "description": "The days the override will start.",
+          "name": "Start days"
+        },
+        "override_start_time": {
+          "description": "The time the override will start.",
+          "name": "Start time"
+        }
+      },
+      "name": "Set the user override current"
     },
     "start_charge_session": {
       "description": "Starts a new charge session on a specified charge point.",
