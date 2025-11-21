@@ -8,13 +8,12 @@ from typing import Any
 from unittest.mock import MagicMock, patch
 
 from bluecurrent_api import Client
-
 from homeassistant.components.blue_current import EVSE_ID, PLUG_AND_CHARGE
 from homeassistant.components.blue_current.const import (
-    PUBLIC_CHARGING,
-    UID,
     DELAYED_CHARGING,
     PRICE_BASED_CHARGING,
+    PUBLIC_CHARGING,
+    UID,
 )
 from homeassistant.const import CONF_ID
 from homeassistant.core import HomeAssistant

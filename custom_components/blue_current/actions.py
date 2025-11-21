@@ -244,33 +244,28 @@ async def set_price_based_charging(
     """Set smart charging profile."""
     device_id = service_call.data["device_id"]
 
-    battery_size_kwh = service_call.data["battery_size_kwh"]
-    minimum_pct = service_call.data["minimum_pct"]
+    battery_size_kwh = service_call.data.get("battery_size")
+    minimum_pct = service_call.data.get("minimum_percentage")
 
     device = dr.async_get(hass).devices[device_id]
     evse_id = next(
         identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
     )
 
+    if battery_size_kwh is None and minimum_pct is None:
+        return
+
     profile = get_current_smart_charging_profile(charge_points[evse_id])
 
-    print("SET PRICE BASED CHARGING")
-    print(device_id)
-    print(evse_id)
-    print(profile)
-    print(battery_size_kwh)
-    print(minimum_pct)
+    await switch_profile_if_needed(
+        evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
+    )
 
-    # await switch_profile_if_needed(
-    #     evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
-    # )
-    #
-    # await client.set_price_based_settings(
-    #     evse_id,
-    #     expected_departure_time,
-    #     expected_charging_session_size,
-    #     immediately_charge,
-    # )
+    await client.update_price_based_charging_settings(
+        evse_id=evse_id,
+        battery_size_kwh=battery_size_kwh,
+        minimum_percentage=minimum_pct,
+    )
 
 
 async def update_price_based_charging(
@@ -282,10 +277,17 @@ async def update_price_based_charging(
     """Set smart charging profile."""
     device_id = service_call.data["device_id"]
 
-    expected_departure_time_data = service_call.data["expected_departure_time"]
-    expected_departure_time = timedelta_to_str(expected_departure_time_data)
+    expected_departure_time_data = service_call.data.get("expected_departure_time")
+    expected_departure_time = (
+        timedelta_to_str(expected_departure_time_data)
+        if expected_departure_time_data is not None
+        else None
+    )
 
-    current_battery_percentage = service_call.data["expected_departure_time"]
+    current_battery_percentage = service_call.data.get("current_percentage")
+
+    if expected_departure_time_data is None and current_battery_percentage is None:
+        return
 
     device = dr.async_get(hass).devices[device_id]
 
@@ -295,21 +297,15 @@ async def update_price_based_charging(
 
     profile = get_current_smart_charging_profile(charge_points[evse_id])
 
-    print("UPDATE PRICE BASED CHARGING")
-    print(device_id)
-    print(expected_departure_time)
-    print(current_battery_percentage)
+    await switch_profile_if_needed(
+        evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
+    )
 
-    # await switch_profile_if_needed(
-    #     evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
-    # )
-    #
-    # await client.set_price_based_settings(
-    #     evse_id,
-    #     expected_departure_time,
-    #     expected_charging_session_size,
-    #     immediately_charge,
-    # )
+    await client.update_price_based_charging_settings(
+        evse_id=evse_id,
+        expected_departure_time=expected_departure_time,
+        current_battery_percentage=current_battery_percentage,
+    )
 
 
 async def switch_profile_if_needed(

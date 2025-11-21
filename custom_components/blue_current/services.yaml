@@ -116,7 +116,7 @@ set_price_based_charging:
           min: 1
           unit_of_measurement: kWh
           mode: box
-      required: true
+      required: false
     minimum_percentage:
       selector:
         number:
@@ -124,7 +124,7 @@ set_price_based_charging:
           max: 100
           unit_of_measurement: "%"
           mode: box
-      required: true
+      required: false
 
 update_price_based_charging:
   fields:
@@ -136,7 +136,7 @@ update_price_based_charging:
     expected_departure_time:
       selector:
         time:
-      required: true
+      required: false
     current_percentage:
       selector:
         number:
@@ -144,4 +144,4 @@ update_price_based_charging:
           max: 100
           unit_of_measurement: "%"
           mode: box
-      required: true
+      required: false

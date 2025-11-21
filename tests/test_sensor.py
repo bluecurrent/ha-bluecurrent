@@ -3,13 +3,12 @@
 from datetime import datetime
 
 import pytest
-
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 
-from . import init_integration
-
 from tests.common import MockConfigEntry
+
+from . import init_integration
 
 charge_point = {
     "evse_id": "101",

@@ -35,21 +35,28 @@ from .actions import (
     update_price_based_charging,
 )
 from .const import (
+    BATTERY_SIZE,
     BCU_APP,
     CHARGEPOINT_SETTINGS,
     CHARGEPOINT_STATUS,
     CHARGING_CARD_ID,
     CURRENT,
+    CURRENT_PERCENTAGE,
+    DAYS,
     DEVICE_IDS,
     DOMAIN,
+    END_TIME,
     EVSE_ID,
+    EXPECTED_DEPARTURE_TIME,
     LOGGER,
+    MINIMUM_PERCENTAGE,
     OVERRIDE_END_DAYS,
     OVERRIDE_END_TIME,
     OVERRIDE_START_DAYS,
     OVERRIDE_START_TIME,
     PLUG_AND_CHARGE,
     SERVICE_START_CHARGE_SESSION,
+    START_TIME,
     VALUE,
 )
 
@@ -67,7 +74,15 @@ VALUE_TYPES = [CHARGEPOINT_STATUS, CHARGEPOINT_SETTINGS]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+DAY_OPTIONS = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+]
 
 SERVICE_START_CHARGE_SESSION_SCHEMA = vol.Schema(
     {
@@ -82,9 +97,9 @@ SERVICE_SET_USER_OVERRIDE_SCHEMA = vol.Schema(
         vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
         vol.Required(CURRENT): cv.positive_int,
         vol.Required(OVERRIDE_START_TIME): cv.time_period,
-        vol.Required(OVERRIDE_START_DAYS): cv.multi_select(DAYS),
+        vol.Required(OVERRIDE_START_DAYS): cv.multi_select(DAY_OPTIONS),
         vol.Required(OVERRIDE_END_TIME): cv.time_period,
-        vol.Required(OVERRIDE_END_DAYS): cv.multi_select(DAYS),
+        vol.Required(OVERRIDE_END_DAYS): cv.multi_select(DAY_OPTIONS),
     }
 )
 
@@ -96,26 +111,26 @@ SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
 
 SERVICE_SET_PRICE_BASED_CHARGING_SCHEMA = vol.Schema(
     {
-        vol.Required("device_id"): cv.string,
-        vol.Required("battery_size"): vol.Range(1),
-        vol.Required("minimum_percentage"): vol.Range(1, 100),
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Optional(BATTERY_SIZE): vol.Range(1),
+        vol.Optional(MINIMUM_PERCENTAGE): vol.Range(1, 100),
     }
 )
 
 SERVICE_UPDATE_PRICE_BASED_CHARGING_SCHEMA = vol.Schema(
     {
-        vol.Required("device_id"): cv.string,
-        vol.Required("expected_departure_time"): cv.time_period,
-        vol.Required("current_percentage"): vol.Range(1, 100),
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Optional(EXPECTED_DEPARTURE_TIME): cv.time_period,
+        vol.Optional(CURRENT_PERCENTAGE): vol.Range(1, 100),
     }
 )
 
 SERVICE_DELAYED_CHARGING_SCHEMA = vol.Schema(
     {
-        vol.Required("device_id"): cv.string,
-        vol.Required("days"): cv.multi_select(DAYS),
-        vol.Required("end_time"): cv.time_period,
-        vol.Required("start_time"): cv.time_period,
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required(DAYS): cv.multi_select(DAY_OPTIONS),
+        vol.Required(END_TIME): cv.time_period,
+        vol.Required(START_TIME): cv.time_period,
     }
 )
 
@@ -293,8 +308,6 @@ class Connector:
         """Handle received data."""
 
         object_name: str = message[OBJECT]
-
-        print(message)
 
         # gets charge point ids
         if object_name == CHARGE_POINTS:
