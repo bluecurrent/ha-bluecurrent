@@ -122,3 +122,40 @@ Clear the user override on a charge point.
 | Data attribute | Optional | Description                                |
 | -------------- | -------- | ------------------------------------------ |
 | `device_ids`   | no       | The ID's of the Blue Current charge point. |
+
+### Action set_delayed_charging
+
+Delay your charging session to avoid your peak usage time.
+Set the smart charging profile for Delayed Charging.
+
+| Data attribute | Optional | Description                                                                  |
+| -------------- | -------- | ---------------------------------------------------------------------------- |
+| `device_id`    | no       | The ID of the Blue Current charge point.                                     |
+| `days`         | no       | List with days the delayed charging profile will be active.                  |
+| `end_time`     | no       | The time the delayed charging will start.                                    |
+| `start_time`   | no       | The time at which delayed charging will end and normal charging will resume. |
+
+### Action set_price_based_charging
+
+Use the hourly price of dynamic energy contracts to charge when the price is lowest.
+Set the smart charging profile for Price-Based Charging.
+If an optional data attribute is not provided, the previously configured value will be used.
+
+| Data attribute       | Optional | Description                                                                    |
+| -------------------- | -------- | ------------------------------------------------------------------------------ |
+| `device_id`          | no       | The ID of the Blue Current charge point.                                       |
+| `battery_size`       | yes      | The vehicle battery size in kWh.                                               |
+| `minimum_percentage` | yes      | The minimum charging percentage the car needs, before starting smart charging. |
+
+### Action clear_user_override
+
+Update the expected departure time and current battery percentage for the vehicle that is using Price-Based Charging.
+If an optional data attribute is not provided, the previously configured value will be used.
+
+> Note: The `set_price_based_charging` action must be called at least once before this action can be called.
+
+| Data attribute            | Optional | Description                                               |
+| ------------------------- | -------- | --------------------------------------------------------- |
+| `device_id`               | no       | The ID of the Blue Current charge point.                  |
+| `expected_departure_time` | yes      | Expected departure time when you want to leave.           |
+| `device_ids`              | yes      | The current battery percentage of the charging vehicle. . |
