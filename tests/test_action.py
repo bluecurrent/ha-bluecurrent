@@ -3,7 +3,10 @@
 from typing import Any
 from unittest.mock import call
 
-from bluecurrent_api.types import OverrideCurrentPayload
+from bluecurrent_api.types import (
+    OverrideCurrentPayload,
+    UpdatePriceBasedSettingsPayload,
+)
 from homeassistant.components.blue_current import DOMAIN
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
@@ -43,7 +46,13 @@ async def test_price_based_charging_action(
     )
 
     client.update_price_based_charging_settings.assert_called_once_with(
-        evse_id="101", battery_size_kwh=60, minimum_percentage=10
+        evse_id="101",
+        payload=UpdatePriceBasedSettingsPayload(
+            expected_departure_time=None,
+            current_battery_percentage=None,
+            minimum_percentage=10,
+            battery_size_kwh=60,
+        ),
     )
 
 
@@ -93,7 +102,13 @@ async def test_update_price_based_charging_action(
     )
 
     client.update_price_based_charging_settings.assert_called_once_with(
-        evse_id="101", expected_departure_time="14:00", current_battery_percentage=20
+        evse_id="101",
+        payload=UpdatePriceBasedSettingsPayload(
+            expected_departure_time="14:00",
+            current_battery_percentage=20,
+            minimum_percentage=None,
+            battery_size_kwh=None,
+        ),
     )
 
 

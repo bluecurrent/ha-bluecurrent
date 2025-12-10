@@ -4,7 +4,10 @@ from datetime import timedelta
 from typing import Any
 
 from bluecurrent_api import Client
-from bluecurrent_api.types import OverrideCurrentPayload
+from bluecurrent_api.types import (
+    OverrideCurrentPayload,
+    UpdatePriceBasedSettingsPayload,
+)
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import device_registry as dr
 
@@ -263,8 +266,9 @@ async def set_price_based_charging(
 
     await client.update_price_based_charging_settings(
         evse_id=evse_id,
-        battery_size_kwh=battery_size_kwh,
-        minimum_percentage=minimum_pct,
+        payload=UpdatePriceBasedSettingsPayload(
+            battery_size_kwh=battery_size_kwh, minimum_percentage=minimum_pct
+        ),
     )
 
 
@@ -303,8 +307,10 @@ async def update_price_based_charging(
 
     await client.update_price_based_charging_settings(
         evse_id=evse_id,
-        expected_departure_time=expected_departure_time,
-        current_battery_percentage=current_battery_percentage,
+        payload=UpdatePriceBasedSettingsPayload(
+            expected_departure_time=expected_departure_time,
+            current_battery_percentage=current_battery_percentage,
+        ),
     )
 
 
