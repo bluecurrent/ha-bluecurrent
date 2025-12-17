@@ -180,6 +180,12 @@
       "options": {
         "without_charging_card": "Without charging card"
       }
+    },
+    "sorting_order": {
+      "options": {
+        "desc": "Descending",
+        "asc": "Ascending"
+      }
     }
   },
   "services": {
@@ -233,24 +239,6 @@
       },
       "name": "Set Price-Based Charging profile"
     },
-    "update_price_based_charging": {
-      "description": "Update the expected departure time and current battery percentage for the vehicle that is using price based charging.",
-      "fields": {
-        "current_percentage": {
-          "description": "The current battery percentage of the charging vehicle.",
-          "name": "Current battery percentage"
-        },
-        "device_id": {
-          "description": "The ID of the Blue Current charge point.",
-          "name": "Device ID"
-        },
-        "expected_departure_time": {
-          "description": "Expected departure time when you want to leave.",
-          "name": "Expected departure time"
-        }
-      },
-      "name": "Update Price-Based Charging profile"
-    },
     "set_user_override": {
       "description": "Set the maximum current that can be used while Smart Charging.",
       "fields": {
@@ -294,6 +282,53 @@
         }
       },
       "name": "Start charge session"
+    },
+    "update_price_based_charging": {
+      "description": "Update the expected departure time and current battery percentage for the vehicle that is using price based charging.",
+      "fields": {
+        "current_percentage": {
+          "description": "The current battery percentage of the charging vehicle.",
+          "name": "Current battery percentage"
+        },
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "expected_departure_time": {
+          "description": "Expected departure time when you want to leave.",
+          "name": "Expected departure time"
+        }
+      },
+      "name": "Update Price-Based Charging profile"
+    },
+    "get_transactions": {
+      "description": "Retrieve charge transactions.",
+      "fields": {
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "page": {
+          "description": "The page of transactions that are requested.",
+          "name": "Page"
+        },
+        "from_date": {
+          "description": "Get all transactions starting from this date.",
+          "name": "From"
+        },
+        "to_date": {
+          "description": "Get all transactions until this date.",
+          "name": "To"
+        },
+        "order": {
+          "name": "Sorting order"
+        },
+        "search_field": {
+          "name": "Search field",
+          "description": "The field to search on."
+        }
+      },
+      "name": "Update Price-Based Charging profile"
     }
   }
 }

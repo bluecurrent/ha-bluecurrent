@@ -16,7 +16,12 @@ from bluecurrent_api.exceptions import (
 )
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import CONF_API_TOKEN, CONF_DEVICE_ID, Platform
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import (
+    HomeAssistant,
+    ServiceCall,
+    ServiceResponse,
+    SupportsResponse,
+)
 from homeassistant.exceptions import (
     ConfigEntryAuthFailed,
     ConfigEntryNotReady,
@@ -29,6 +34,7 @@ from homeassistant.helpers.typing import ConfigType
 
 from .actions import (
     clear_user_override,
+    get_transactions,
     set_delayed_charging,
     set_price_based_charging,
     set_user_override,
@@ -134,6 +140,18 @@ SERVICE_DELAYED_CHARGING_SCHEMA = vol.Schema(
     }
 )
 
+GET_TRANSACTIONS_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required("page"): cv.positive_int,
+        vol.Optional("from_date"): cv.date,
+        vol.Optional("to_date"): cv.date,
+        # TODO: Make not multi select
+        vol.Optional("order"): cv.multi_select(["desc", "asc"]),
+        vol.Optional("search_field"): cv.string,
+    }
+)
+
 
 async def async_setup_entry(
     hass: HomeAssistant, config_entry: BlueCurrentConfigEntry
@@ -177,6 +195,10 @@ async def async_setup_entry(
         """Clear user override."""
         await clear_user_override(hass, client, connector.schedules, service_call)
 
+    async def get_transactions_call(service_call: ServiceCall) -> ServiceResponse:
+        """Get transactions."""
+        return await get_transactions(hass, client, service_call)
+
     hass.services.async_register(
         DOMAIN,
         "set_user_override",
@@ -210,6 +232,14 @@ async def async_setup_entry(
         "set_delayed_charging",
         set_delayed_charging_call,
         SERVICE_DELAYED_CHARGING_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "get_transactions",
+        get_transactions_call,
+        GET_TRANSACTIONS_SCHEMA,
+        supports_response=SupportsResponse.ONLY,
     )
 
     await client.wait_for_charge_points()

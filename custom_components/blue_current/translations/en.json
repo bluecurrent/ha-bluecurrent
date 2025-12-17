@@ -180,6 +180,12 @@
       "options": {
         "without_charging_card": "Without charging card"
       }
+    },
+    "sorting_order": {
+      "options": {
+        "asc": "Ascending",
+        "desc": "Descending"
+      }
     }
   },
   "services": {
@@ -192,6 +198,35 @@
         }
       },
       "name": "Clear the user override current"
+    },
+    "get_transactions": {
+      "description": "Retrieve charge transactions.",
+      "fields": {
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "from_date": {
+          "description": "Get all transactions starting from this date.",
+          "name": "From"
+        },
+        "order": {
+          "name": "Sorting order"
+        },
+        "page": {
+          "description": "The page of transactions that are requested.",
+          "name": "Page"
+        },
+        "search_field": {
+          "description": "The field to search on.",
+          "name": "Search field"
+        },
+        "to_date": {
+          "description": "Get all transactions until this date.",
+          "name": "To"
+        }
+      },
+      "name": "Update Price-Based Charging profile"
     },
     "set_delayed_charging": {
       "description": "Change the current smart charging profile to Delayed Charging.",

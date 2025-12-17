@@ -8,7 +8,7 @@ from bluecurrent_api.types import (
     OverrideCurrentPayload,
     UpdatePriceBasedSettingsPayload,
 )
-from homeassistant.core import HomeAssistant, ServiceCall
+from homeassistant.core import HomeAssistant, ServiceCall, ServiceResponse
 from homeassistant.helpers import device_registry as dr
 
 from .const import (
@@ -312,6 +312,42 @@ async def update_price_based_charging(
             current_battery_percentage=current_battery_percentage,
         ),
     )
+
+
+async def get_transactions(
+    hass: HomeAssistant,
+    client: Client,
+    service_call: ServiceCall,
+) -> ServiceResponse:
+    """Get transactions."""
+    device_id = service_call.data["device_id"]
+    page = service_call.data["page"]
+    to_date = service_call.data["to_date"]
+    from_date = service_call.data.get("from_date")
+    order = service_call.data.get("order")
+    search_field = service_call.data.get("search_field")
+
+    print(page)
+    print(from_date)
+    print(to_date)
+    print(order)
+    print(search_field)
+
+    device = dr.async_get(hass).devices[device_id]
+
+    evse_id = next(
+        identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
+    )
+
+    print(f"Retrieving transactions for evse id {evse_id}")
+
+    result = await client.get_transactions(
+        [evse_id], 1, to_date, from_date, sort_field_order="DESC"
+    )
+
+    print(result)
+
+    return result
 
 
 async def switch_profile_if_needed(

@@ -145,3 +145,35 @@ update_price_based_charging:
           unit_of_measurement: "%"
           mode: box
       required: false
+
+get_transactions:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    page:
+      selector:
+        number:
+      required: true
+    to_date:
+      selector:
+        date:
+      required: true
+    from_date:
+      selector:
+        date:
+      required: false
+    order:
+      selector:
+        select:
+          translation_key: sorting_order
+          options:
+            - desc
+            - asc
+      required: false
+    search_field:
+      selector:
+        text:
+      required: false
