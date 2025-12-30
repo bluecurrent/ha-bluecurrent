@@ -54,3 +54,11 @@ OVERRIDE_END_TIME = "override_end_time"
 DELAYED_CHARGING = "delayed_charging"
 PRICE_BASED_CHARGING = "price_based_charging"
 SMART_CHARGING = "smart_charging"
+
+BATTERY_SIZE = "battery_size"
+MINIMUM_PERCENTAGE = "minimum_percentage"
+EXPECTED_DEPARTURE_TIME = "expected_departure_time"
+CURRENT_PERCENTAGE = "current_percentage"
+
+DAYS = "days"
+END_TIME = "end_time"

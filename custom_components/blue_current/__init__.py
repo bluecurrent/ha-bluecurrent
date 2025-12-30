@@ -6,6 +6,7 @@ import asyncio
 from contextlib import suppress
 from typing import Any
 
+import voluptuous as vol
 from bluecurrent_api import Client
 from bluecurrent_api.exceptions import (
     BlueCurrentException,
@@ -13,8 +14,6 @@ from bluecurrent_api.exceptions import (
     RequestLimitReached,
     WebsocketError,
 )
-import voluptuous as vol
-
 from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import CONF_API_TOKEN, CONF_DEVICE_ID, Platform
 from homeassistant.core import HomeAssistant, ServiceCall
@@ -23,28 +22,42 @@ from homeassistant.exceptions import (
     ConfigEntryNotReady,
     ServiceValidationError,
 )
-from homeassistant.helpers import config_validation as cv, device_registry as dr
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
-from .actions import set_user_override, clear_user_override
 
+from .actions import (
+    clear_user_override,
+    set_delayed_charging,
+    set_price_based_charging,
+    set_user_override,
+    update_price_based_charging,
+)
 from .const import (
+    BATTERY_SIZE,
     BCU_APP,
     CHARGEPOINT_SETTINGS,
     CHARGEPOINT_STATUS,
     CHARGING_CARD_ID,
+    CURRENT,
+    CURRENT_PERCENTAGE,
+    DAYS,
+    DEVICE_IDS,
     DOMAIN,
+    END_TIME,
     EVSE_ID,
+    EXPECTED_DEPARTURE_TIME,
     LOGGER,
+    MINIMUM_PERCENTAGE,
+    OVERRIDE_END_DAYS,
+    OVERRIDE_END_TIME,
+    OVERRIDE_START_DAYS,
+    OVERRIDE_START_TIME,
     PLUG_AND_CHARGE,
     SERVICE_START_CHARGE_SESSION,
+    START_TIME,
     VALUE,
-    DEVICE_IDS,
-    CURRENT,
-    OVERRIDE_START_TIME,
-    OVERRIDE_START_DAYS,
-    OVERRIDE_END_TIME,
-    OVERRIDE_END_DAYS,
 )
 
 type BlueCurrentConfigEntry = ConfigEntry[Connector]
@@ -61,7 +74,15 @@ VALUE_TYPES = [CHARGEPOINT_STATUS, CHARGEPOINT_SETTINGS]
 
 CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)
 
-DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+DAY_OPTIONS = [
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+    "sunday",
+]
 
 SERVICE_START_CHARGE_SESSION_SCHEMA = vol.Schema(
     {
@@ -76,15 +97,40 @@ SERVICE_SET_USER_OVERRIDE_SCHEMA = vol.Schema(
         vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
         vol.Required(CURRENT): cv.positive_int,
         vol.Required(OVERRIDE_START_TIME): cv.time_period,
-        vol.Required(OVERRIDE_START_DAYS): cv.multi_select(DAYS),
+        vol.Required(OVERRIDE_START_DAYS): cv.multi_select(DAY_OPTIONS),
         vol.Required(OVERRIDE_END_TIME): cv.time_period,
-        vol.Required(OVERRIDE_END_DAYS): cv.multi_select(DAYS),
+        vol.Required(OVERRIDE_END_DAYS): cv.multi_select(DAY_OPTIONS),
     }
 )
 
 SERVICE_CLEAR_USER_OVERRIDE_SCHEMA = vol.Schema(
     {
         vol.Required(DEVICE_IDS): vol.All(cv.ensure_list, [cv.string]),
+    }
+)
+
+SERVICE_SET_PRICE_BASED_CHARGING_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Optional(BATTERY_SIZE): vol.Range(1),
+        vol.Optional(MINIMUM_PERCENTAGE): vol.Range(1, 100),
+    }
+)
+
+SERVICE_UPDATE_PRICE_BASED_CHARGING_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Optional(EXPECTED_DEPARTURE_TIME): cv.time_period,
+        vol.Optional(CURRENT_PERCENTAGE): vol.Range(1, 100),
+    }
+)
+
+SERVICE_DELAYED_CHARGING_SCHEMA = vol.Schema(
+    {
+        vol.Required(CONF_DEVICE_ID): cv.string,
+        vol.Required(DAYS): cv.multi_select(DAY_OPTIONS),
+        vol.Required(END_TIME): cv.time_period,
+        vol.Required(START_TIME): cv.time_period,
     }
 )
 
@@ -107,6 +153,22 @@ async def async_setup_entry(
         hass, connector.run_task(), "blue_current-websocket"
     )
 
+    async def set_price_based_charging_call(service_call: ServiceCall) -> None:
+        """Set smart charging profile."""
+        await set_price_based_charging(
+            hass, client, connector.charge_points, service_call
+        )
+
+    async def update_price_based_charging_call(service_call: ServiceCall) -> None:
+        """Update smart charging profile."""
+        await update_price_based_charging(
+            hass, client, connector.charge_points, service_call
+        )
+
+    async def set_delayed_charging_call(service_call: ServiceCall) -> None:
+        """Set price based charging."""
+        await set_delayed_charging(hass, client, connector.charge_points, service_call)
+
     async def set_user_override_call(service_call: ServiceCall) -> None:
         """Set user override."""
         await set_user_override(hass, client, connector.schedules, service_call)
@@ -127,6 +189,27 @@ async def async_setup_entry(
         "clear_user_override",
         clear_user_override_call,
         SERVICE_CLEAR_USER_OVERRIDE_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_price_based_charging",
+        set_price_based_charging_call,
+        SERVICE_SET_PRICE_BASED_CHARGING_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "update_price_based_charging",
+        update_price_based_charging_call,
+        SERVICE_UPDATE_PRICE_BASED_CHARGING_SCHEMA,
+    )
+
+    hass.services.async_register(
+        DOMAIN,
+        "set_delayed_charging",
+        set_delayed_charging_call,
+        SERVICE_DELAYED_CHARGING_SCHEMA,
     )
 
     await client.wait_for_charge_points()
@@ -155,16 +238,29 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
                 translation_domain=DOMAIN, translation_key="invalid_device_id"
             )
 
-        config_entry = hass.config_entries.async_get_entry(
-            list(device.config_entries)[0]
-        )
+        blue_current_config_entry: ConfigEntry | None = None
 
-        if config_entry is None or config_entry.state is not ConfigEntryState.LOADED:
+        for config_entry_id in device.config_entries:
+            config_entry = hass.config_entries.async_get_entry(config_entry_id)
+            if not config_entry or config_entry.domain != DOMAIN:
+                # Not the blue_current config entry.
+                continue
+
+            if config_entry.state is not ConfigEntryState.LOADED:
+                raise ServiceValidationError(
+                    translation_domain=DOMAIN, translation_key="config_entry_not_loaded"
+                )
+
+            blue_current_config_entry = config_entry
+            break
+
+        if not blue_current_config_entry:
+            # The device is not connected to a valid blue_current config entry.
             raise ServiceValidationError(
-                translation_domain=DOMAIN, translation_key="config_entry_not_loaded"
+                translation_domain=DOMAIN, translation_key="no_config_entry"
             )
 
-        connector = config_entry.runtime_data
+        connector = blue_current_config_entry.runtime_data
 
         # Get the evse_id from the identifier of the device.
         evse_id = next(

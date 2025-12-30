@@ -4,14 +4,17 @@ from datetime import timedelta
 from typing import Any
 
 from bluecurrent_api import Client
-from bluecurrent_api.types import OverrideCurrentPayload
-
+from bluecurrent_api.types import (
+    OverrideCurrentPayload,
+    UpdatePriceBasedSettingsPayload,
+)
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import device_registry as dr
 
 from .const import (
     CHARGE_POINTS,
     CURRENT,
+    DELAYED_CHARGING,
     DEVICE_IDS,
     DOMAIN,
     FRIDAY,
@@ -21,12 +24,15 @@ from .const import (
     OVERRIDE_END_TIME,
     OVERRIDE_START_DAYS,
     OVERRIDE_START_TIME,
+    PRICE_BASED_CHARGING,
     SATURDAY,
+    SMART_CHARGING,
     START_TIME,
     STOP_TIME,
     SUNDAY,
     THURSDAY,
     TUESDAY,
+    VALUE,
     WEDNESDAY,
 )
 
@@ -192,6 +198,141 @@ async def remove_update_and_create(
 
     if override_current_payload is not None:
         await client.set_user_override_current(override_current_payload)
+
+
+async def set_delayed_charging(
+    hass: HomeAssistant,
+    client: Client,
+    charge_points: dict[str, dict],
+    service_call: ServiceCall,
+) -> None:
+    """Set price based charging."""
+    device_id = service_call.data["device_id"]
+    device = dr.async_get(hass).devices[device_id]
+
+    days_to_number = {
+        "monday": 1,
+        "tuesday": 2,
+        "wednesday": 3,
+        "thursday": 4,
+        "friday": 5,
+        "saturday": 6,
+        "sunday": 7,
+    }
+
+    selected_days = service_call.data["days"]
+
+    day_numbers = [days_to_number[day] for day in selected_days]
+    start_time = timedelta_to_str(service_call.data["start_time"])
+    end_time = timedelta_to_str(service_call.data["end_time"])
+
+    evse_id = list(device.identifiers)[0][1]
+
+    await switch_profile_if_needed(evse_id, client, charge_points, DELAYED_CHARGING)
+
+    await client.set_delayed_charging_settings(
+        evse_id, day_numbers, start_time, end_time
+    )
+
+
+async def set_price_based_charging(
+    hass: HomeAssistant,
+    client: Client,
+    charge_points: dict[str, dict],
+    service_call: ServiceCall,
+) -> None:
+    """Set smart charging profile."""
+    device_id = service_call.data["device_id"]
+
+    battery_size_kwh = service_call.data.get("battery_size")
+    minimum_pct = service_call.data.get("minimum_percentage")
+
+    device = dr.async_get(hass).devices[device_id]
+    evse_id = next(
+        identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
+    )
+
+    if battery_size_kwh is None and minimum_pct is None:
+        return
+
+    await switch_profile_if_needed(evse_id, client, charge_points, PRICE_BASED_CHARGING)
+
+    await client.update_price_based_charging_settings(
+        evse_id=evse_id,
+        payload=UpdatePriceBasedSettingsPayload(
+            battery_size_kwh=battery_size_kwh, minimum_percentage=minimum_pct
+        ),
+    )
+
+
+async def update_price_based_charging(
+    hass: HomeAssistant,
+    client: Client,
+    charge_points: dict[str, dict],
+    service_call: ServiceCall,
+) -> None:
+    """Set smart charging profile."""
+    device_id = service_call.data["device_id"]
+
+    expected_departure_time_data = service_call.data.get("expected_departure_time")
+    expected_departure_time = (
+        timedelta_to_str(expected_departure_time_data)
+        if expected_departure_time_data is not None
+        else None
+    )
+
+    current_battery_percentage = service_call.data.get("current_percentage")
+
+    if expected_departure_time_data is None and current_battery_percentage is None:
+        return
+
+    device = dr.async_get(hass).devices[device_id]
+
+    evse_id = next(
+        identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
+    )
+
+    await switch_profile_if_needed(evse_id, client, charge_points, PRICE_BASED_CHARGING)
+
+    await client.update_price_based_charging_settings(
+        evse_id=evse_id,
+        payload=UpdatePriceBasedSettingsPayload(
+            expected_departure_time=expected_departure_time,
+            current_battery_percentage=current_battery_percentage,
+        ),
+    )
+
+
+async def switch_profile_if_needed(
+    evse_id: str,
+    client: Client,
+    charge_points: dict[str, dict],
+    new_profile: str,
+) -> None:
+    """Change to a new smart charging profile. Turn the previous profile off when this profile was enabled."""
+    current_profile = get_current_smart_charging_profile(charge_points[evse_id])
+
+    change_profile_functions = {
+        PRICE_BASED_CHARGING: client.set_price_based_charging,
+        DELAYED_CHARGING: client.set_delayed_charging,
+    }
+
+    if current_profile != new_profile:
+        await change_profile_functions[new_profile](evse_id, True)
+        charge_points[evse_id][new_profile][VALUE] = True
+        if current_profile is not None:
+            charge_points[evse_id][current_profile][VALUE] = False
+            await change_profile_functions[current_profile](evse_id, False)
+
+
+def get_current_smart_charging_profile(charge_point: dict[str, Any]) -> str | None:
+    """Get the currently active smart charging profile for the given charge point."""
+    if charge_point[SMART_CHARGING]:
+        if charge_point[PRICE_BASED_CHARGING][VALUE]:
+            return PRICE_BASED_CHARGING
+        if charge_point[DELAYED_CHARGING][VALUE]:
+            return DELAYED_CHARGING
+    return None
 
 
 def timedelta_to_str(time: timedelta) -> str:

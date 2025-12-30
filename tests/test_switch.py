@@ -14,9 +14,9 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_registry import EntityRegistry
 
-from . import init_integration
-
 from tests.common import MockConfigEntry
+
+from . import init_integration
 
 
 async def test_switches(

@@ -1,11 +1,28 @@
 {
   "entity": {
-    "sensor": {
-      "vehicle_status": {
-        "default": "mdi:car"
+    "button": {
+      "boost": {
+        "default": "mdi:rocket-launch-outline"
       },
+      "reboot": {
+        "default": "mdi:restart-alert"
+      },
+      "reset": {
+        "default": "mdi:restart"
+      },
+      "stop_charge_session": {
+        "default": "mdi:stop"
+      }
+    },
+    "sensor": {
       "activity": {
         "default": "mdi:ev-station"
+      },
+      "current_left": {
+        "default": "mdi:gauge"
+      },
+      "max_offline": {
+        "default": "mdi:gauge-full"
       },
       "max_usage": {
         "default": "mdi:gauge-full"
@@ -13,45 +30,40 @@
       "smartcharging_max_usage": {
         "default": "mdi:gauge-full"
       },
-      "max_offline": {
-        "default": "mdi:gauge-full"
-      },
-      "current_left": {
-        "default": "mdi:gauge"
-      }
-    },
-    "button": {
-      "reset": {
-        "default": "mdi:restart"
-      },
-      "reboot": {
-        "default": "mdi:restart-alert"
-      },
-      "stop_charge_session": {
-        "default": "mdi:stop"
-      },
-      "boost": {
-        "default": "mdi:rocket-launch-outline"
+      "vehicle_status": {
+        "default": "mdi:car"
       }
     },
     "switch": {
-      "plug_and_charge": {
-        "default": "mdi:ev-plug-type2"
+      "block": {
+        "default": "mdi:lock"
       },
       "linked_charge_cards": {
         "default": "mdi:account-group"
       },
-      "block": {
-        "default": "mdi:lock"
+      "plug_and_charge": {
+        "default": "mdi:ev-plug-type2"
       }
     }
   },
   "services": {
-    "start_charge_session": {
-      "service": "mdi:play"
-    },
     "clear_user_override": {
       "service": "mdi:close-thick"
+    },
+    "set_delayed_charging": {
+      "service": "mdi:clock-outline"
+    },
+    "set_price_based_charging": {
+      "service": "mdi:cash-multiple"
+    },
+    "update_price_based_charging": {
+      "service": "mdi:cash-multiple"
+    },
+    "set_user_override": {
+      "service": "mdi:sine-wave"
+    },
+    "start_charge_session": {
+      "service": "mdi:play"
     }
   }
 }

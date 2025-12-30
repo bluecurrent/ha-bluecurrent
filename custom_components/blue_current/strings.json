@@ -1,5 +1,17 @@
 {
   "config": {
+    "abort": {
+      "already_configured": "[%key:common::config_flow::abort::already_configured_account%]",
+      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
+      "wrong_account": "Wrong account: Please authenticate with the API token for {email}."
+    },
+    "error": {
+      "already_connected": "Already connected",
+      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
+      "invalid_token": "Invalid token",
+      "limit_reached": "Request limit reached",
+      "unknown": "[%key:common::config_flow::error::unknown%]"
+    },
     "step": {
       "user": {
         "data": {
@@ -8,63 +20,36 @@
         "description": "Enter your Blue Current API token",
         "title": "Authentication"
       }
-    },
-    "error": {
-      "cannot_connect": "[%key:common::config_flow::error::cannot_connect%]",
-      "limit_reached": "Request limit reached",
-      "invalid_token": "Invalid token",
-      "already_connected": "Already connected",
-      "unknown": "[%key:common::config_flow::error::unknown%]"
-    },
-    "abort": {
-      "already_configured": "[%key:common::config_flow::abort::already_configured_account%]",
-      "reauth_successful": "[%key:common::config_flow::abort::reauth_successful%]",
-      "wrong_account": "Wrong account: Please authenticate with the API token for {email}."
-    }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "data": {
-          "card": "Card"
-        },
-        "description": "Select the default charging card you want to use"
-      }
     }
   },
   "entity": {
+    "button": {
+      "boost": {
+        "name": "Boost charge session"
+      },
+      "reboot": {
+        "name": "Reboot"
+      },
+      "reset": {
+        "name": "Reset"
+      },
+      "stop_charge_session": {
+        "name": "Stop charge session"
+      }
+    },
     "sensor": {
       "activity": {
         "name": "Activity",
         "state": {
           "available": "Available",
           "charging": "[%key:common::state::charging%]",
-          "unavailable": "Unavailable",
           "error": "[%key:common::state::error%]",
-          "offline": "Offline"
+          "offline": "Offline",
+          "unavailable": "Unavailable"
         }
       },
-      "vehicle_status": {
-        "name": "Vehicle status",
-        "state": {
-          "standby": "[%key:common::state::standby%]",
-          "vehicle_detected": "Detected",
-          "ready": "Ready",
-          "no_power": "No power",
-          "vehicle_error": "[%key:common::state::error%]"
-        }
-      },
-      "actual_v1": {
-        "name": "Voltage phase 1"
-      },
-      "actual_v2": {
-        "name": "Voltage phase 2"
-      },
-      "actual_v3": {
-        "name": "Voltage phase 3"
-      },
-      "avg_voltage": {
-        "name": "Average voltage"
+      "actual_kwh": {
+        "name": "Energy usage"
       },
       "actual_p1": {
         "name": "Current phase 1"
@@ -75,35 +60,20 @@
       "actual_p3": {
         "name": "Current phase 3"
       },
+      "actual_v1": {
+        "name": "Voltage phase 1"
+      },
+      "actual_v2": {
+        "name": "Voltage phase 2"
+      },
+      "actual_v3": {
+        "name": "Voltage phase 3"
+      },
       "avg_current": {
         "name": "Average current"
       },
-      "total_kw": {
-        "name": "Total power"
-      },
-      "actual_kwh": {
-        "name": "Energy usage"
-      },
-      "start_datetime": {
-        "name": "Started on"
-      },
-      "stop_datetime": {
-        "name": "Stopped on"
-      },
-      "offline_since": {
-        "name": "Offline since"
-      },
-      "total_cost": {
-        "name": "Total cost"
-      },
-      "max_usage": {
-        "name": "Max usage"
-      },
-      "smartcharging_max_usage": {
-        "name": "Smart charging max usage"
-      },
-      "max_offline": {
-        "name": "Offline max usage"
+      "avg_voltage": {
+        "name": "Average voltage"
       },
       "current_left": {
         "name": "Remaining current"
@@ -122,114 +92,208 @@
       },
       "grid_max_current": {
         "name": "Max grid current"
-      }
-    },
-    "button": {
-      "stop_charge_session": {
-        "name": "Stop charge session"
       },
-      "reboot": {
-        "name": "Reboot"
+      "max_offline": {
+        "name": "Offline max usage"
       },
-      "reset": {
-        "name": "Reset"
+      "max_usage": {
+        "name": "Max usage"
       },
-      "boost": {
-        "name": "Boost charge session"
+      "offline_since": {
+        "name": "Offline since"
+      },
+      "smartcharging_max_usage": {
+        "name": "Smart charging max usage"
+      },
+      "start_datetime": {
+        "name": "Started on"
+      },
+      "stop_datetime": {
+        "name": "Stopped on"
+      },
+      "total_cost": {
+        "name": "Total cost"
+      },
+      "total_kw": {
+        "name": "Total power"
+      },
+      "vehicle_status": {
+        "name": "Vehicle status",
+        "state": {
+          "no_power": "No power",
+          "ready": "Ready",
+          "standby": "[%key:common::state::standby%]",
+          "vehicle_detected": "Detected",
+          "vehicle_error": "[%key:common::state::error%]"
+        }
       }
     },
     "switch": {
-      "plug_and_charge": {
-        "name": "Plug & Charge"
+      "block": {
+        "name": "Block charge point"
       },
       "linked_charge_cards_only": {
         "name": "Linked charging cards only"
       },
-      "block": {
-        "name": "Block charge point"
-      }
-    }
-  },
-  "selector": {
-    "select_charging_card": {
-      "options": {
-        "without_charging_card": "Without charging card"
-      }
-    },
-    "days": {
-      "options": {
-        "monday": "[%key:common::time::monday%]",
-        "tuesday": "[%key:common::time::tuesday%]",
-        "wednesday": "[%key:common::time::wednesday%]",
-        "thursday": "[%key:common::time::thursday%]",
-        "friday": "[%key:common::time::friday%]",
-        "saturday": "[%key:common::time::saturday%]",
-        "sunday": "[%key:common::time::sunday%]"
-      }
-    }
-  },
-  "services": {
-    "start_charge_session": {
-      "name": "Start charge session",
-      "description": "Starts a new charge session on a specified charge point.",
-      "fields": {
-        "charging_card_id": {
-          "name": "Charging card ID",
-          "description": "Optional charging card ID that will be used to start a charge session. When not provided, no charging card will be used."
-        },
-        "device_id": {
-          "name": "Device ID",
-          "description": "The ID of the Blue Current charge point."
-        }
-      }
-    },
-    "set_user_override": {
-      "name": "Set the user override current",
-      "description": "Set the maximum current that can be used while Smart Charging.",
-      "fields": {
-        "device_ids": {
-          "name": "Device ID's",
-          "description": "The ID's of the Blue Current charge point."
-        },
-        "current": {
-          "name": "Current",
-          "description": "If the current that Smart Charging would advise is higher thant the user override, it will advise the user override instead."
-        },
-        "override_start_days": {
-          "name": "Start days",
-          "description": "The days the override will start."
-        },
-        "override_start_time": {
-          "name": "Start time",
-          "description": "The time the override will start."
-        },
-        "override_end_days": {
-          "name": "End days",
-          "description": "The days the override will end."
-        },
-        "override_end_time": {
-          "name": "End time",
-          "description": "The time the override will end."
-        }
-      }
-    },
-    "clear_user_override": {
-      "name": "Clear the user override current",
-      "description": "Clear the override current on charge points.",
-      "fields": {
-        "device_ids": {
-          "name": "Device ID's",
-          "description": "The ID's of the Blue Current charge point."
-        }
+      "plug_and_charge": {
+        "name": "Plug & Charge"
       }
     }
   },
   "exceptions": {
+    "config_entry_not_loaded": {
+      "message": "Config entry not loaded."
+    },
     "invalid_device_id": {
       "message": "Invalid device ID given."
     },
-    "config_entry_not_loaded": {
-      "message": "Config entry not loaded."
+    "no_config_entry": {
+      "message": "Device has not a valid blue_current config entry."
+    },
+    "smart_charging_not_supported": {
+      "message": "Cannot use smart charging on this charge point."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "data": {
+          "card": "Card"
+        },
+        "description": "Select the default charging card you want to use"
+      }
+    }
+  },
+  "selector": {
+    "days": {
+      "options": {
+        "friday": "[%key:common::time::friday%]",
+        "monday": "[%key:common::time::monday%]",
+        "saturday": "[%key:common::time::saturday%]",
+        "sunday": "[%key:common::time::sunday%]",
+        "thursday": "[%key:common::time::thursday%]",
+        "tuesday": "[%key:common::time::tuesday%]",
+        "wednesday": "[%key:common::time::wednesday%]"
+      }
+    },
+    "select_charging_card": {
+      "options": {
+        "without_charging_card": "Without charging card"
+      }
+    }
+  },
+  "services": {
+    "clear_user_override": {
+      "description": "Clear the override current on charge points.",
+      "fields": {
+        "device_ids": {
+          "description": "The ID's of the Blue Current charge point.",
+          "name": "Device ID's"
+        }
+      },
+      "name": "Clear the user override current"
+    },
+    "set_delayed_charging": {
+      "description": "Change the current smart charging profile to Delayed Charging.",
+      "fields": {
+        "days": {
+          "description": "Days that price based charging is activated.",
+          "name": "Days"
+        },
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "end_time": {
+          "description": "Time when the delay charging ends.",
+          "name": "Delay to"
+        },
+        "start_time": {
+          "description": "Time when the delay charging starts.",
+          "name": "Delay from"
+        }
+      },
+      "name": "Set Delayed Charging profile"
+    },
+    "set_price_based_charging": {
+      "description": "Change the current smart charging profile to Price-Based Charging.",
+      "fields": {
+        "battery_size": {
+          "description": "The vehicle battery size in kWh.",
+          "name": "Battery size"
+        },
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "minimum_percentage": {
+          "description": "The minimum charging percentage the car needs, before starting smart charging.",
+          "name": "Minimum percentage"
+        }
+      },
+      "name": "Set Price-Based Charging profile"
+    },
+    "update_price_based_charging": {
+      "description": "Update the expected departure time and current battery percentage for the vehicle that is using price based charging.",
+      "fields": {
+        "current_percentage": {
+          "description": "The current battery percentage of the charging vehicle.",
+          "name": "Current battery percentage"
+        },
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        },
+        "expected_departure_time": {
+          "description": "Expected departure time when you want to leave.",
+          "name": "Expected departure time"
+        }
+      },
+      "name": "Update Price-Based Charging profile"
+    },
+    "set_user_override": {
+      "description": "Set the maximum current that can be used while Smart Charging.",
+      "fields": {
+        "current": {
+          "description": "If the current that Smart Charging would advise is higher thant the user override, it will advise the user override instead.",
+          "name": "Current"
+        },
+        "device_ids": {
+          "description": "The ID's of the Blue Current charge point.",
+          "name": "Device ID's"
+        },
+        "override_end_days": {
+          "description": "The days the override will end.",
+          "name": "End days"
+        },
+        "override_end_time": {
+          "description": "The time the override will end.",
+          "name": "End time"
+        },
+        "override_start_days": {
+          "description": "The days the override will start.",
+          "name": "Start days"
+        },
+        "override_start_time": {
+          "description": "The time the override will start.",
+          "name": "Start time"
+        }
+      },
+      "name": "Set the user override current"
+    },
+    "start_charge_session": {
+      "description": "Starts a new charge session on a specified charge point.",
+      "fields": {
+        "charging_card_id": {
+          "description": "Optional charging card ID that will be used to start a charge session. When not provided, no charging card will be used.",
+          "name": "Charging card ID"
+        },
+        "device_id": {
+          "description": "The ID of the Blue Current charge point.",
+          "name": "Device ID"
+        }
+      },
+      "name": "Start charge session"
     }
   }
 }

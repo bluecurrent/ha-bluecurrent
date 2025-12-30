@@ -72,3 +72,76 @@ clear_user_override:
           integration: blue_current
           multiple: true
       required: true
+
+set_delayed_charging:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    days:
+      selector:
+        select:
+          translation_key: days
+          options:
+            - monday
+            - tuesday
+            - wednesday
+            - thursday
+            - friday
+            - saturday
+            - sunday
+          multiple: true
+      required: true
+    start_time:
+      selector:
+        time:
+      required: true
+    end_time:
+      selector:
+        time:
+      required: true
+
+set_price_based_charging:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    battery_size:
+      selector:
+        number:
+          min: 1
+          unit_of_measurement: kWh
+          mode: box
+      required: false
+    minimum_percentage:
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: box
+      required: false
+
+update_price_based_charging:
+  fields:
+    device_id:
+      selector:
+        device:
+          integration: blue_current
+      required: true
+    expected_departure_time:
+      selector:
+        time:
+      required: false
+    current_percentage:
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+          mode: box
+      required: false
