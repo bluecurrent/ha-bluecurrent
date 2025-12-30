@@ -94,11 +94,11 @@ set_delayed_charging:
             - sunday
           multiple: true
       required: true
-    end_time:
+    start_time:
       selector:
         time:
       required: true
-    start_time:
+    end_time:
       selector:
         time:
       required: true

@@ -132,8 +132,8 @@ Set the smart charging profile for Delayed Charging.
 | -------------- | -------- | ---------------------------------------------------------------------------- |
 | `device_id`    | no       | The ID of the Blue Current charge point.                                     |
 | `days`         | no       | List with days the delayed charging profile will be active.                  |
-| `end_time`     | no       | The time the delayed charging will start.                                    |
-| `start_time`   | no       | The time at which delayed charging will end and normal charging will resume. |
+| `start_time`   | no       | The time the delayed charging will start.                                    |
+| `end_time`     | no       | The time at which delayed charging will end and normal charging will resume. |
 
 ### Action set_price_based_charging
 

@@ -228,10 +228,7 @@ async def set_delayed_charging(
 
     evse_id = list(device.identifiers)[0][1]
 
-    profile = get_current_smart_charging_profile(charge_points[evse_id])
-    await switch_profile_if_needed(
-        evse_id, client, charge_points, profile, DELAYED_CHARGING
-    )
+    await switch_profile_if_needed(evse_id, client, charge_points, DELAYED_CHARGING)
 
     await client.set_delayed_charging_settings(
         evse_id, day_numbers, start_time, end_time
@@ -258,11 +255,7 @@ async def set_price_based_charging(
     if battery_size_kwh is None and minimum_pct is None:
         return
 
-    profile = get_current_smart_charging_profile(charge_points[evse_id])
-
-    await switch_profile_if_needed(
-        evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
-    )
+    await switch_profile_if_needed(evse_id, client, charge_points, PRICE_BASED_CHARGING)
 
     await client.update_price_based_charging_settings(
         evse_id=evse_id,
@@ -299,11 +292,7 @@ async def update_price_based_charging(
         identifier[1] for identifier in device.identifiers if identifier[0] == DOMAIN
     )
 
-    profile = get_current_smart_charging_profile(charge_points[evse_id])
-
-    await switch_profile_if_needed(
-        evse_id, client, charge_points, profile, PRICE_BASED_CHARGING
-    )
+    await switch_profile_if_needed(evse_id, client, charge_points, PRICE_BASED_CHARGING)
 
     await client.update_price_based_charging_settings(
         evse_id=evse_id,
@@ -318,10 +307,11 @@ async def switch_profile_if_needed(
     evse_id: str,
     client: Client,
     charge_points: dict[str, dict],
-    current_profile: str | None,
     new_profile: str,
 ) -> None:
     """Change to a new smart charging profile. Turn the previous profile off when this profile was enabled."""
+    current_profile = get_current_smart_charging_profile(charge_points[evse_id])
+
     change_profile_functions = {
         PRICE_BASED_CHARGING: client.set_price_based_charging,
         DELAYED_CHARGING: client.set_delayed_charging,

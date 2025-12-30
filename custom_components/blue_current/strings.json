@@ -205,12 +205,12 @@
           "name": "Device ID"
         },
         "end_time": {
-          "description": "Time when the delay starts.",
-          "name": "Delay from"
+          "description": "Time when the delay charging ends.",
+          "name": "Delay to"
         },
         "start_time": {
-          "description": "Time when the delay ends.",
-          "name": "Delay to"
+          "description": "Time when the delay charging starts.",
+          "name": "Delay from"
         }
       },
       "name": "Set Delayed Charging profile"
