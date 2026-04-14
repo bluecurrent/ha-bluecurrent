@@ -24,7 +24,7 @@ Currently, two Blue Current Home Assistant integrations exist:
 - [The HACS integration: This integration can only be downloaded when a user has HACS installed](https://github.com/bluecurrent/ha-bluecurrent)
 
 Because the HACS integration does not require a code review from Home Assistant, we first test Home Assistant features in the HACS integration.
-Once the feature is tested in the HACS integration and is conciderd stable, it can be implemenated in the Core integration.
+Once the feature is tested in the HACS integration and is considered stable, it can be implemenated in the Core integration.
 Because we test functionality in the HACS integration first, this version most likely contains more functionality than the Core integration.
 
 Features that require testing, are published on HACS as Pre-release (via GitHub releases).
@@ -43,7 +43,7 @@ _Current pre-release versions: [v0.3.0](https://github.com/bluecurrent/ha-bluecu
   - Stop charging (when charging)
 - **Switch**
   - Enable/disable Plug and Charge
-  - Enable/disable Linked chargeing cards only
+  - Enable/disable Linked charging cards only
   - Enable/disable chargepoint block
 
 ## Extra features in HACS (not yet available in Core)
