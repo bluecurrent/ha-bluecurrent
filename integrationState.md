@@ -64,6 +64,6 @@ _Current pre-release versions: [v0.3.0](https://github.com/bluecurrent/ha-bluecu
 
 ## Features in development
 
-Currently, the get transactions feature is still in development. Get transactions in a service that let's a user retrieve their transactions via Home Assistant.
+Currently, the get transactions feature is still in development. Get transactions is a service that let's a user retrieve their transactions via Home Assistant.
 
 The current branch can be found here: https://github.com/bluecurrent/ha-bluecurrent/tree/get-transactions
