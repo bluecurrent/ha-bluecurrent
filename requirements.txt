@@ -2,4 +2,4 @@ colorlog==6.10.1
 homeassistant==2025.5.1
 pip>=8.0.3,<26.1
 ruff==0.14.14
-bluecurrent_api>=1.2.4
+bluecurrent_api>=1.3.3
